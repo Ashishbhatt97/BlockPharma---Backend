@@ -33,3 +33,24 @@ The BlockPharma Backend is a server-side application designed to power the Block
 
    ```bash
    git clone https://github.com/Ashishbhatt97/BlockPharma---Backend.git
+
+2. **Navigate to the project directory:**
+
+   ```bash
+   cd BlockPharma---Backend
+
+3. **Install the necessary packages:**
+  
+   ```bash
+   npm install
+
+4. **Rename .env.example:**
+
+- Change name `.env.example` to `.env`
+- Create Your Own `JWT_SECRET_KEY=` Key
+- Setup Postgres server and paste the URL in `DATABASE_URL =`
+
+5. **Running the Project**
+
+   ```bash
+   npm run build
