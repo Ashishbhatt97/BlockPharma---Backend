@@ -28,4 +28,4 @@ const sendResponse = (res: Response, status: number, data: any) => {
   }
 };
 
-module.exports = sendResponse;
+export default sendResponse;
