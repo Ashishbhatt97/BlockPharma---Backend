@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@prisma/client": "^5.19.0",
     "@types/cors": "^2.8.17",
     "@types/express": "github:types/express",
     "concurrently": "^8.2.2",
