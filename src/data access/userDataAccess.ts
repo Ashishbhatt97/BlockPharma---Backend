@@ -1,6 +1,10 @@
 import prisma from "../config/db.config";
-import { RegisterSchemaType } from "../models/Users";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { RegisterSchemaType, loginSchemaType } from "../models/Users";
+require("dotenv").config();
+
+const SECRET = process.env.SECRET_KEY;
 
 const createUser = async (userObj: RegisterSchemaType) => {
   try {
@@ -71,4 +75,65 @@ const findUserByEmail = async (email: string) => {
   }
 };
 
-export default { createUser, findUserByEmail };
+const loginUser = async (userObj: loginSchemaType) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: userObj.email,
+      },
+    });
+
+    if (user) {
+      const isValidPassword = await bcrypt.compare(
+        userObj.password,
+        user.password
+      );
+
+      if (!isValidPassword)
+        return {
+          status: 401,
+          data: {
+            status: false,
+            message: "Invalid email or password",
+          },
+        };
+
+      if (!SECRET) {
+        return {
+          status: 400,
+          data: {
+            status: false,
+            message: "Invalid SECRET",
+          },
+        };
+      }
+
+      const token = jwt.sign({ email: userObj.email, id: user.id }, SECRET, {
+        expiresIn: "30d",
+      });
+
+      return {
+        status: 200,
+        data: {
+          status: true,
+          message: "Login successful",
+          user: {
+            id: user.id,
+            email: user.email,
+          },
+          token: token,
+        },
+      };
+    }
+  } catch (error: any) {
+    return {
+      status: 500,
+      data: {
+        status: false,
+        message: error.message,
+      },
+    };
+  }
+};
+
+export default { createUser, findUserByEmail, loginUser };
