@@ -1,9 +1,13 @@
 import { Request, Response } from "express";
 import asyncHandler from "../middleware/asyncHandler";
 import sendResponse from "../helper/responseHelper";
-import { signupSchema } from "../models/models";
 import { userServices } from "../services/services";
-import { RegisterSchemaType } from "../models/Users";
+import {
+  signupSchema,
+  loginSchemaType,
+  loginSchema,
+  RegisterSchemaType,
+} from "../models/Users";
 
 // @desc    User Registration
 // @route   /api/user/register
@@ -25,6 +29,29 @@ const userRegister = asyncHandler(async (req: Request, res: Response) => {
   sendResponse(res, result!.status, result.data);
 });
 
+// @desc    User Login Handler
+// @route   /api/user/login
+// @access  POST
+const userLogin = asyncHandler(async (req: Request, res: Response) => {
+  const parseResult = loginSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    return sendResponse(res, 400, {
+      error: parseResult.error.issues[0].message,
+    });
+  }
+
+  // Extract validated data
+  const validatedData: loginSchemaType = parseResult.data;
+
+  const result = await userServices.userLoginService(validatedData);
+
+  if (result?.status !== undefined) {
+    sendResponse(res, result?.status, result);
+  }
+});
+
 export default {
   userRegister,
+  userLogin,
 };
