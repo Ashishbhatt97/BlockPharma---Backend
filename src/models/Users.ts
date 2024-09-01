@@ -23,5 +23,24 @@ export const loginSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
+// Update Schema
+export const updateUserSchema = z.object({
+  firstName: z.string().min(1, "First name is required").optional(),
+  lastName: z.string().min(1, "Last name is required").optional(),
+  email: z.string().email("Invalid email address").optional(),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters long")
+    .optional(),
+  role: Role.optional(), // Default will be handled by your ORM
+  phoneNumber: z
+    .string()
+    .length(10, "Phone number must be exactly 10 digits")
+    .regex(/^\d+$/, "Phone number must contain only digits")
+    .optional(),
+  isDeleted: z.boolean().optional(),
+});
+
 export type loginSchemaType = z.infer<typeof loginSchema>;
 export type RegisterSchemaType = z.infer<typeof signupSchema>;
+export type updateUserSchemaType = z.infer<typeof updateUserSchema>;

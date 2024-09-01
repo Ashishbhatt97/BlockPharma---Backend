@@ -1,5 +1,9 @@
 import { userDataAccess } from "../data access/dataAccess";
-import { loginSchemaType, RegisterSchemaType } from "../models/Users";
+import {
+  loginSchemaType,
+  RegisterSchemaType,
+  updateUserSchemaType,
+} from "../models/Users";
 
 // User Registration Service
 const userRegisterService = async (userObj: RegisterSchemaType) => {
@@ -39,6 +43,70 @@ const userLoginService = async (userObj: loginSchemaType) => {
   try {
     const res = await userDataAccess.loginUser(userObj);
 
+    if (!res) return { error: "Invalid Credentials", status: 400 };
+
+    // Ensure `res` is defined and contains a `status` property
+    if (res) {
+      if (res.status === 200) {
+        return {
+          status: 200,
+          data: {
+            message: res.data?.message || "Login successful",
+            user: res.data?.user || null,
+            token: res.data?.token || null,
+          },
+        };
+      } else if (res.status === 401) {
+        return {
+          status: 401,
+          data: {
+            message: "Invalid email or password",
+            user: null,
+            token: null,
+          },
+        };
+      } else {
+        // Handle other status codes if necessary
+        return {
+          status: res.status,
+          data: {
+            message: res.data?.message || "An error occurred",
+            user: null,
+            token: null,
+          },
+        };
+      }
+    }
+
+    // Handle cases where `res` is undefined or does not have a status
+    return {
+      status: 400,
+      data: {
+        message: "Invalid response format",
+        user: null,
+        token: null,
+      },
+    };
+  } catch (error) {
+    return {
+      status: 400,
+      data: {
+        message: "Error parsing user data",
+        user: null,
+        token: null,
+      },
+    };
+  }
+};
+
+//User Update Service
+const updateUserService = async (
+  userId: string,
+  userObj: updateUserSchemaType
+) => {
+  try {
+    const res = await userDataAccess.updateUser(userId, userObj);
+
     if (!res || res.status !== 200) {
       return {
         status: res?.status,
@@ -52,10 +120,9 @@ const userLoginService = async (userObj: loginSchemaType) => {
     if (res.status === 200) {
       return {
         status: 200,
-        message: res?.data.message,
-        body: {
+        data: {
+          message: res?.data.message,
           user: res?.data.user,
-          token: res?.data.token,
         },
       };
     }
@@ -70,4 +137,4 @@ const userLoginService = async (userObj: loginSchemaType) => {
   }
 };
 
-export default { userRegisterService, userLoginService };
+export default { userRegisterService, userLoginService, updateUserService };
