@@ -7,7 +7,10 @@ import {
   loginSchemaType,
   loginSchema,
   RegisterSchemaType,
+  updateUserSchemaType,
+  updateUserSchema,
 } from "../models/Users";
+import { CustomRequest } from "../middleware/jwtAuthentication";
 
 // @desc    User Registration
 // @route   /api/user/register
@@ -40,18 +43,98 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
       error: parseResult.error.issues[0].message,
     });
   }
-
-  // Extract validated data
   const validatedData: loginSchemaType = parseResult.data;
 
   const result = await userServices.userLoginService(validatedData);
 
   if (result?.status !== undefined) {
-    sendResponse(res, result?.status, result);
+    sendResponse(res, result.status, result);
   }
 });
+
+// @desc    User Details Update Handler
+// @route   /api/user/update
+// @access  PUT
+const updateUserDetails = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const { id } = req.user;
+
+    const parseResult = updateUserSchema.safeParse(req.body);
+
+    if (!parseResult.success) {
+      return sendResponse(res, 400, {
+        message: parseResult.error.issues[0].message,
+      });
+    }
+
+    const validatedData: updateUserSchemaType = parseResult.data;
+
+    const result = await userServices.updateUserDetailsService(
+      id,
+      validatedData
+    );
+
+    sendResponse(res, result!.status, result);
+  }
+);
+
+// @desc    Update User to Supplier and Pharmacy
+// @route   /api/user/upgradeUser
+// @access  PUT
+const upgradeUser = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, { message: "Unauthorized" });
+  }
+
+  const { id } = req.user;
+
+  const parseResult = updateUserSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    return sendResponse(res, 400, {
+      message: parseResult.error.issues[0].message,
+    });
+  }
+
+  const validatedData: updateUserSchemaType = parseResult.data;
+
+  const result = await userServices.upgradeUserService(id, validatedData);
+
+  sendResponse(res, result!.status, result);
+});
+
+// @desc    User change Password
+// @route   /api/user/changepassword
+// @access  PUT
+const changePassword = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const { id } = req.user;
+    const { oldPassword, newPassword } = req.body;
+
+    const result = await userServices.changePasswordService(
+      id,
+      oldPassword,
+      newPassword
+    );
+
+    if (result?.status !== undefined) {
+      sendResponse(res, result?.status, result.data);
+    }
+  }
+);
 
 export default {
   userRegister,
   userLogin,
+  updateUserDetails,
+  upgradeUser,
+  changePassword,
 };
