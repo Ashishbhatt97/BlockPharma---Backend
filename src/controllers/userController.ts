@@ -107,9 +107,31 @@ const upgradeUser = asyncHandler(async (req: CustomRequest, res: Response) => {
   sendResponse(res, result!.status, result);
 });
 
+const changePassword = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const { id } = req.user;
+    const { oldPassword, newPassword } = req.body;
+
+    const result = await userServices.changePasswordService(
+      id,
+      oldPassword,
+      newPassword
+    );
+
+    if (result?.status !== undefined) {
+      sendResponse(res, result?.status, result.data);
+    }
+  }
+);
+
 export default {
   userRegister,
   userLogin,
   updateUserDetails,
   upgradeUser,
+  changePassword,
 };

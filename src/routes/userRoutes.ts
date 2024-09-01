@@ -9,5 +9,8 @@ router.post("/register", userController.userRegister);
 router.post("/login", userController.userLogin);
 router.route("/update").put(jwtAuth as any, userController.updateUserDetails);
 router.route("/upgradeUser").put(jwtAuth as any, userController.upgradeUser);
+router
+  .route("/changepassword")
+  .put(jwtAuth as any, userController.changePassword);
 
 export default router;

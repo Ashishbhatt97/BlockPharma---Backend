@@ -238,10 +238,68 @@ const upgradeUser = async (userId: string, userObj: updateUserSchemaType) => {
   }
 };
 
+const changePassword = async (
+  userId: string,
+  oldPassword: string,
+  newPassword: string
+) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) return null;
+
+    if (user) {
+      const isValidPassword = bcrypt.compare(oldPassword, user.password);
+
+      if (!isValidPassword) return null;
+    }
+
+    //Hashed New Password
+    const hashedNewPassword = bcrypt.hashSync(newPassword, 10);
+
+    const passwordRes = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        password: hashedNewPassword,
+      },
+    });
+    console.log(passwordRes);
+    if (!passwordRes) {
+      return {
+        status: false,
+        data: {
+          message: "Failed to update password",
+        },
+      };
+    }
+
+    return {
+      status: 200,
+      data: {
+        status: true,
+        message: "Password Updated Successfully",
+      },
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      data: {
+        message: error.message,
+      },
+    };
+  }
+};
+
 export default {
   createUser,
   findUserByEmail,
   loginUser,
   updateUserDetails,
   upgradeUser,
+  changePassword,
 };

@@ -1,3 +1,4 @@
+import { error } from "console";
 import { userDataAccess } from "../data access/dataAccess";
 import {
   loginSchemaType,
@@ -174,9 +175,41 @@ const upgradeUserService = async (
   }
 };
 
+const changePasswordService = async (
+  userId: string,
+  oldPassword: string,
+  newPassword: string
+) => {
+  const res = await userDataAccess.changePassword(
+    userId,
+    oldPassword,
+    newPassword
+  );
+
+  if (!res) {
+    return {
+      status: 400,
+      data: {
+        status: false,
+        message: "Error changing password",
+      },
+    };
+  }
+
+  if (res.status === 200) {
+    return {
+      status: 200,
+      data: {
+        message: res?.data.message,
+      },
+    };
+  }
+};
+
 export default {
   userRegisterService,
   userLoginService,
   updateUserDetailsService,
   upgradeUserService,
+  changePasswordService,
 };
