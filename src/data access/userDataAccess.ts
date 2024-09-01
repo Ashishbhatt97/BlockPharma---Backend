@@ -135,7 +135,10 @@ const loginUser = async (userObj: loginSchemaType) => {
   }
 };
 
-const updateUser = async (userId: string, userObj: updateUserSchemaType) => {
+const updateUserDetails = async (
+  userId: string,
+  userObj: updateUserSchemaType
+) => {
   try {
     // Check if the user exists
     const existingUser = await prisma.user.findUnique({
@@ -187,4 +190,58 @@ const updateUser = async (userId: string, userObj: updateUserSchemaType) => {
   }
 };
 
-export default { createUser, findUserByEmail, loginUser, updateUser };
+const upgradeUser = async (userId: string, userObj: updateUserSchemaType) => {
+  try {
+    // Check if the user exists
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!existingUser) {
+      return {
+        status: 404,
+        data: {
+          status: false,
+          message: "User not found.",
+        },
+      };
+    }
+
+    // Update the user details
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        role: userObj.role,
+      },
+    });
+
+    return {
+      status: 200,
+      data: {
+        status: true,
+        message: "Congratulation!! You are Upgraded to Supplier",
+        user: updatedUser,
+      },
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      data: {
+        status: false,
+        message: error.message,
+      },
+    };
+  }
+};
+
+export default {
+  createUser,
+  findUserByEmail,
+  loginUser,
+  updateUserDetails,
+  upgradeUser,
+};

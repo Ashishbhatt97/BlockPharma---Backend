@@ -100,12 +100,49 @@ const userLoginService = async (userObj: loginSchemaType) => {
 };
 
 //User Update Service
-const updateUserService = async (
+const updateUserDetailsService = async (
   userId: string,
   userObj: updateUserSchemaType
 ) => {
   try {
-    const res = await userDataAccess.updateUser(userId, userObj);
+    const res = await userDataAccess.updateUserDetails(userId, userObj);
+
+    if (!res || res.status !== 200) {
+      return {
+        status: res?.status,
+        data: {
+          status: false,
+          message: res?.data.message,
+        },
+      };
+    }
+
+    if (res.status === 200) {
+      return {
+        status: 200,
+        data: {
+          message: res?.data.message,
+          user: res?.data.user,
+        },
+      };
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      data: {
+        status: false,
+        message: "Error parsing user data",
+      },
+    };
+  }
+};
+//Become Supplier Service
+const upgradeUserService = async (
+  userId: string,
+  userObj: updateUserSchemaType
+) => {
+  try {
+    const res = await userDataAccess.upgradeUser(userId, userObj);
 
     if (!res || res.status !== 200) {
       return {
@@ -137,4 +174,9 @@ const updateUserService = async (
   }
 };
 
-export default { userRegisterService, userLoginService, updateUserService };
+export default {
+  userRegisterService,
+  userLoginService,
+  updateUserDetailsService,
+  upgradeUserService,
+};

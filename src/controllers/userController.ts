@@ -55,7 +55,37 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
 // @desc    User Details Update Handler
 // @route   /api/user/update
 // @access  PUT
-const updateUser = asyncHandler(async (req: CustomRequest, res: Response) => {
+const updateUserDetails = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const { id } = req.user;
+
+    const parseResult = updateUserSchema.safeParse(req.body);
+
+    if (!parseResult.success) {
+      return sendResponse(res, 400, {
+        message: parseResult.error.issues[0].message,
+      });
+    }
+
+    const validatedData: updateUserSchemaType = parseResult.data;
+
+    const result = await userServices.updateUserDetailsService(
+      id,
+      validatedData
+    );
+
+    sendResponse(res, result!.status, result);
+  }
+);
+
+// @desc    Update User to Supplier and Pharmacy
+// @route   /api/user/update
+// @access  PUT
+const upgradeUser = asyncHandler(async (req: CustomRequest, res: Response) => {
   if (!req.user) {
     return sendResponse(res, 401, { message: "Unauthorized" });
   }
@@ -72,7 +102,7 @@ const updateUser = asyncHandler(async (req: CustomRequest, res: Response) => {
 
   const validatedData: updateUserSchemaType = parseResult.data;
 
-  const result = await userServices.updateUserService(id, validatedData);
+  const result = await userServices.upgradeUserService(id, validatedData);
 
   sendResponse(res, result!.status, result);
 });
@@ -80,5 +110,6 @@ const updateUser = asyncHandler(async (req: CustomRequest, res: Response) => {
 export default {
   userRegister,
   userLogin,
-  updateUser,
+  updateUserDetails,
+  upgradeUser,
 };
