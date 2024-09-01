@@ -175,6 +175,7 @@ const upgradeUserService = async (
   }
 };
 
+//Change Password Service
 const changePasswordService = async (
   userId: string,
   oldPassword: string,
@@ -206,10 +207,35 @@ const changePasswordService = async (
   }
 };
 
+//Delete User Service
+const deleteUserService = async (userId: string) => {
+  const res = await userDataAccess.deleteUser(userId);
+
+  if (!res || res.status !== 200) {
+    return {
+      status: 400,
+      data: {
+        status: false,
+        message: "Error deleting user",
+      },
+    };
+  }
+
+  if (res.status === 200) {
+    return {
+      status: 200,
+      data: {
+        message: res?.data.message,
+      },
+    };
+  }
+};
+
 export default {
   userRegisterService,
   userLoginService,
   updateUserDetailsService,
   upgradeUserService,
   changePasswordService,
+  deleteUserService,
 };

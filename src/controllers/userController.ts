@@ -131,10 +131,28 @@ const changePassword = asyncHandler(
   }
 );
 
+// @desc    User delete
+// @route   /api/user/delete
+// @access  DELETE
+const deleteUser = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, { message: "Unauthorized" });
+  }
+
+  const { id } = req.user;
+
+  const result = await userServices.deleteUserService(id);
+
+  if (result?.status !== undefined) {
+    sendResponse(res, result.status, result);
+  }
+});
+
 export default {
   userRegister,
   userLogin,
   updateUserDetails,
   upgradeUser,
   changePassword,
+  deleteUser,
 };

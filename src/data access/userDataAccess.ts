@@ -141,11 +141,7 @@ const updateUserDetails = async (
 ) => {
   try {
     // Check if the user exists
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const existingUser = await getUserById(userId);
 
     if (!existingUser) {
       return {
@@ -193,11 +189,7 @@ const updateUserDetails = async (
 const upgradeUser = async (userId: string, userObj: updateUserSchemaType) => {
   try {
     // Check if the user exists
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const existingUser = await getUserById(userId);
 
     if (!existingUser) {
       return {
@@ -244,11 +236,7 @@ const changePassword = async (
   newPassword: string
 ) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const user = await getUserById(userId);
     if (!user) return null;
 
     if (user) {
@@ -295,6 +283,70 @@ const changePassword = async (
   }
 };
 
+const deleteUser = async (userId: string) => {
+  try {
+    const user = await getUserById(userId);
+    if (!user) return null;
+
+    const deletedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    if (!deletedUser) {
+      return {
+        status: 400,
+        data: {
+          status: false,
+          message: "Error deleting user",
+        },
+      };
+    }
+
+    return {
+      status: 200,
+      data: {
+        status: true,
+        message: "User deleted successfully",
+      },
+    };
+  } catch (error: any) {
+    return {
+      status: 400,
+      data: {
+        message: error.message,
+      },
+    };
+  }
+};
+
+const getUserById = async (userId: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+    return user;
+  } catch (error: any) {
+    return null;
+  }
+};
+
+const isUserDeleted = async (userId: string) => {
+  const user = await getUserById(userId);
+  if (!user) return null;
+  return user.isDeleted;
+};
+
 export default {
   createUser,
   findUserByEmail,
@@ -302,4 +354,7 @@ export default {
   updateUserDetails,
   upgradeUser,
   changePassword,
+  deleteUser,
+  getUserById,
+  isUserDeleted,
 };
