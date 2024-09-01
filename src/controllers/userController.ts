@@ -83,7 +83,7 @@ const updateUserDetails = asyncHandler(
 );
 
 // @desc    Update User to Supplier and Pharmacy
-// @route   /api/user/update
+// @route   /api/user/upgradeUser
 // @access  PUT
 const upgradeUser = asyncHandler(async (req: CustomRequest, res: Response) => {
   if (!req.user) {
@@ -107,6 +107,9 @@ const upgradeUser = asyncHandler(async (req: CustomRequest, res: Response) => {
   sendResponse(res, result!.status, result);
 });
 
+// @desc    User change Password
+// @route   /api/user/changepassword
+// @access  PUT
 const changePassword = asyncHandler(
   async (req: CustomRequest, res: Response) => {
     if (!req.user) {
