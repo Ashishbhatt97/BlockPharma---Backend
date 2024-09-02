@@ -14,27 +14,18 @@ const userRegisterService = async (userObj: RegisterSchemaType) => {
     if (res.status === 201) {
       return {
         status: res?.status,
-        data: {
-          status: true,
-          message: res?.data.message,
-        },
+        message: res?.data.message,
       };
     }
 
     return {
       status: res?.status,
-      data: {
-        status: false,
-        message: res.data.message,
-      },
+      message: res.data.message,
     };
   } catch (error) {
     return {
       status: 400,
-      data: {
-        status: false,
-        message: "Error parsing user data",
-      },
+      error: "Error parsing user data",
     };
   }
 };
@@ -51,8 +42,8 @@ const userLoginService = async (userObj: loginSchemaType) => {
       if (res.status === 200) {
         return {
           status: 200,
+          message: res.data?.message || "Login successful",
           data: {
-            message: res.data?.message || "Login successful",
             user: res.data?.user || null,
             token: res.data?.token || null,
           },
@@ -60,8 +51,8 @@ const userLoginService = async (userObj: loginSchemaType) => {
       } else if (res.status === 401) {
         return {
           status: 401,
+          message: "Invalid email or password",
           data: {
-            message: "Invalid email or password",
             user: null,
             token: null,
           },
@@ -70,8 +61,8 @@ const userLoginService = async (userObj: loginSchemaType) => {
         // Handle other status codes if necessary
         return {
           status: res.status,
+          message: res.data?.message || "An error occurred",
           data: {
-            message: res.data?.message || "An error occurred",
             user: null,
             token: null,
           },
@@ -82,8 +73,8 @@ const userLoginService = async (userObj: loginSchemaType) => {
     // Handle cases where `res` is undefined or does not have a status
     return {
       status: 400,
+      message: "Invalid response format",
       data: {
-        message: "Invalid response format",
         user: null,
         token: null,
       },
@@ -91,8 +82,8 @@ const userLoginService = async (userObj: loginSchemaType) => {
   } catch (error) {
     return {
       status: 400,
+      message: "Error parsing user data",
       data: {
-        message: "Error parsing user data",
         user: null,
         token: null,
       },
@@ -112,7 +103,6 @@ const updateUserDetailsService = async (
       return {
         status: res?.status,
         data: {
-          status: false,
           message: res?.data.message,
         },
       };
@@ -121,8 +111,8 @@ const updateUserDetailsService = async (
     if (res.status === 200) {
       return {
         status: 200,
+        message: res?.data.message,
         data: {
-          message: res?.data.message,
           user: res?.data.user,
         },
       };
@@ -130,10 +120,7 @@ const updateUserDetailsService = async (
   } catch (error) {
     return {
       status: 400,
-      data: {
-        status: false,
-        message: "Error parsing user data",
-      },
+      error: "Error parsing user data",
     };
   }
 };
@@ -144,22 +131,18 @@ const upgradeUserService = async (
 ) => {
   try {
     const res = await userDataAccess.upgradeUser(userId, userObj);
-
     if (!res || res.status !== 200) {
       return {
         status: res?.status,
-        data: {
-          status: false,
-          message: res?.data.message,
-        },
+        message: res?.data.message,
       };
     }
 
     if (res.status === 200) {
       return {
         status: 200,
+        message: res?.data.message,
         data: {
-          message: res?.data.message,
           user: res?.data.user,
         },
       };
@@ -168,7 +151,6 @@ const upgradeUserService = async (
     return {
       status: 400,
       data: {
-        status: false,
         message: "Error parsing user data",
       },
     };
@@ -189,20 +171,22 @@ const changePasswordService = async (
 
   if (!res) {
     return {
+      status: 404,
+      error: "User not found",
+    };
+  }
+
+  if (res.status === 400) {
+    return {
       status: 400,
-      data: {
-        status: false,
-        message: "Error changing password",
-      },
+      message: res?.data.message,
     };
   }
 
   if (res.status === 200) {
     return {
       status: 200,
-      data: {
-        message: res?.data.message,
-      },
+      message: res?.data.message,
     };
   }
 };
@@ -215,7 +199,6 @@ const deleteUserService = async (userId: string) => {
     return {
       status: 400,
       data: {
-        status: false,
         message: "Error deleting user",
       },
     };
@@ -231,6 +214,37 @@ const deleteUserService = async (userId: string) => {
   }
 };
 
+//Get User By Id Service
+const getUserByIdService = async (userId: string) => {
+  try {
+    const res = await userDataAccess.getUserById(userId);
+    if (!res) {
+      return {
+        status: 400,
+        error: {
+          message: "Error getting user",
+        },
+      };
+    }
+    if (res) {
+      return {
+        status: 200,
+        data: {
+          message: "User fetched successfully",
+          user: res,
+        },
+      };
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      data: {
+        message: "Error getting user",
+      },
+    };
+  }
+};
+
 export default {
   userRegisterService,
   userLoginService,
@@ -238,4 +252,5 @@ export default {
   upgradeUserService,
   changePasswordService,
   deleteUserService,
+  getUserByIdService,
 };

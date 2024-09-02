@@ -1,13 +1,12 @@
-import prisma from "../config/db.config";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import prisma from "../config/db.config";
+import { tokenGenerator } from "../middleware/middlewares";
 import {
   RegisterSchemaType,
   loginSchemaType,
   updateUserSchemaType,
 } from "../models/Users";
 require("dotenv").config();
-import { tokenGenerator } from "../middleware/middlewares";
 
 const SECRET = process.env.SECRET_KEY;
 
@@ -215,7 +214,7 @@ const upgradeUser = async (userId: string, userObj: updateUserSchemaType) => {
       status: 200,
       data: {
         status: true,
-        message: "Congratulation!! You are Upgraded to Supplier",
+        message: `Congratulation!! You are Upgraded to ${userObj.role}`,
         user: updatedUser,
       },
     };
@@ -239,10 +238,15 @@ const changePassword = async (
     const user = await getUserById(userId);
     if (!user) return null;
 
-    if (user) {
-      const isValidPassword = bcrypt.compare(oldPassword, user.password);
+    const isValidPassword = await bcrypt.compare(oldPassword, user.password);
 
-      if (!isValidPassword) return null;
+    if (!isValidPassword) {
+      return {
+        status: 400,
+        data: {
+          message: "Invalid old password",
+        },
+      };
     }
 
     //Hashed New Password
@@ -256,7 +260,6 @@ const changePassword = async (
         password: hashedNewPassword,
       },
     });
-    console.log(passwordRes);
     if (!passwordRes) {
       return {
         status: false,
@@ -332,9 +335,10 @@ const getUserById = async (userId: string) => {
       },
     });
 
-    if (!user) {
+    if (!user || user!.isDeleted === true) {
       return null;
     }
+
     return user;
   } catch (error: any) {
     return null;
