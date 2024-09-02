@@ -21,10 +21,13 @@ model User {
   password    String
   role        Role      @default(USER)
   phoneNumber String
+  profilePic  String?
+  oAuthId     String?
+  provider    String?
   isDeleted   Boolean   @default(false)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  Address     Address[]
+  Addresses   Address[]
 }
 
 enum Role {
@@ -35,13 +38,14 @@ enum Role {
 }
 
 model Address {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
   street    String
   city      String
   state     String
   country   String
   zipCode   String
-  userId    User     @relation(fields: [id], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

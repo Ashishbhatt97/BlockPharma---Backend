@@ -11,14 +11,19 @@ export interface JwtPayload {
   exp: number;
 }
 
-type payloadType = {
-  id: string;
-  email: string;
-};
+export interface AddressType {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zipCode: string;
+  userId: string;
+}
 
 // Extend the Request interface to include `user`
 export interface CustomRequest extends Request {
   user?: JwtPayload;
+  address?: AddressType;
 }
 
 const tokenGenerator = (payload: {}) => {

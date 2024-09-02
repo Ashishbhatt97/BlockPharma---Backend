@@ -11,6 +11,7 @@ import {
   updateUserSchema,
 } from "../models/Users";
 import { CustomRequest } from "../middleware/jwtAuthentication";
+import AddressSchema, { AddressSchemaType } from "../models/Address";
 
 // @desc    User Registration
 // @route   /api/user/register
@@ -165,6 +166,57 @@ const getUserById = asyncHandler(async (req: CustomRequest, res: Response) => {
   }
 });
 
+// @desc    Add Address
+// @route   /api/user/addAddress
+// @access  POST
+const addAddress = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, { message: "Unauthorized" });
+  }
+
+  const { id } = req.user;
+  const parseResult = AddressSchema.safeParse(req.body);
+
+  if (!parseResult.success) {
+    return sendResponse(res, 400, {
+      message: parseResult.error.issues[0].message,
+    });
+  }
+
+  const validatedData: AddressSchemaType = parseResult.data;
+  console.log(validatedData);
+
+  const result = await userServices.addAddressService(id, validatedData);
+
+  sendResponse(res, result!.status, result);
+});
+
+// @desc    Update Address
+// @route   /api/user/updateAddress
+// @access  PUT
+const updateAddress = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const { id } = req.user;
+    const parseResult = AddressSchema.safeParse(req.body);
+
+    if (!parseResult.success) {
+      return sendResponse(res, 400, {
+        message: parseResult.error.issues[0].message,
+      });
+    }
+
+    const validatedData: AddressSchemaType = parseResult.data;
+
+    const result = await userServices.updateAddressService(id, validatedData);
+
+    sendResponse(res, result!.status, result);
+  }
+);
+
 export default {
   userRegister,
   userLogin,
@@ -173,4 +225,6 @@ export default {
   changePassword,
   deleteUser,
   getUserById,
+  addAddress,
+  updateAddress,
 };
