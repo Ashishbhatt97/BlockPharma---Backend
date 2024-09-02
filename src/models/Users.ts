@@ -9,6 +9,9 @@ export const signupSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
+  profilePic: z.string().optional(),
+  oAuthId: z.string().optional(),
+  provider: z.string().optional(),
   role: Role.optional(), // Default will be handled by your ORM
   phoneNumber: z
     .string()
@@ -32,6 +35,7 @@ export const updateUserSchema = z.object({
     .string()
     .min(6, "Password must be at least 6 characters long")
     .optional(),
+  profilePic: z.string().optional(),
   role: Role.optional(), // Default will be handled by your ORM
   phoneNumber: z
     .string()

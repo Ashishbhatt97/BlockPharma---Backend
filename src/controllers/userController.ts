@@ -191,6 +191,32 @@ const addAddress = asyncHandler(async (req: CustomRequest, res: Response) => {
   sendResponse(res, result!.status, result);
 });
 
+// @desc    Update Address
+// @route   /api/user/updateAddress
+// @access  PUT
+const updateAddress = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const { id } = req.user;
+    const parseResult = AddressSchema.safeParse(req.body);
+
+    if (!parseResult.success) {
+      return sendResponse(res, 400, {
+        message: parseResult.error.issues[0].message,
+      });
+    }
+
+    const validatedData: AddressSchemaType = parseResult.data;
+
+    const result = await userServices.updateAddressService(id, validatedData);
+
+    sendResponse(res, result!.status, result);
+  }
+);
+
 export default {
   userRegister,
   userLogin,
@@ -200,4 +226,5 @@ export default {
   deleteUser,
   getUserById,
   addAddress,
+  updateAddress,
 };

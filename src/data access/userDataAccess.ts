@@ -33,6 +33,9 @@ const createUser = async (userObj: RegisterSchemaType) => {
         lastName: userObj.lastName,
         email: userObj.email,
         password: hashedPassword,
+        profilePic: userObj.profilePic || null,
+        oAuthId: userObj.oAuthId || null,
+        provider: userObj.provider || null,
         phoneNumber: userObj.phoneNumber,
         isDeleted: false,
       },
@@ -381,8 +384,46 @@ const addAddress = async (userId: string, addressObj: AddressSchemaType) => {
     return {
       status: 200,
       message: "Address added successfully",
+      data: newAddress,
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      error: error.message,
+    };
+  }
+};
+
+const updateAddress = async (userId: string, addressObj: AddressSchemaType) => {
+  try {
+    const user = await getUserById(userId);
+    if (!user) return null;
+
+    const updatedAddress = await prisma.address.update({
+      where: {
+        userId: userId,
+      },
       data: {
-        address: newAddress,
+        street: addressObj.street,
+        city: addressObj.city,
+        state: addressObj.state,
+        country: addressObj.country,
+        zipCode: addressObj.zipCode,
+      },
+    });
+
+    if (!updatedAddress) {
+      return {
+        status: 400,
+        message: "Failed to update address",
+      };
+    }
+
+    return {
+      status: 200,
+      message: "Address updated successfully",
+      data: {
+        address: updatedAddress,
       },
     };
   } catch (error: any) {
@@ -404,4 +445,5 @@ export default {
   getUserById,
   isUserDeleted,
   addAddress,
+  updateAddress,
 };

@@ -263,6 +263,28 @@ const addAddressService = async (
     return {
       status: 200,
       message: res.message,
+      data: res.data,
+    };
+  }
+};
+
+//Update Address Service
+const updateAddressService = async (
+  userId: string,
+  addressObj: AddressSchemaType
+) => {
+  const res = await userDataAccess.updateAddress(userId, addressObj);
+  if (!res) {
+    return {
+      status: 400,
+      error: "Error updating address",
+    };
+  }
+
+  if (res.status === 200) {
+    return {
+      status: 200,
+      message: res.message,
       data: {
         address: res,
       },
@@ -279,4 +301,5 @@ export default {
   deleteUserService,
   getUserByIdService,
   addAddressService,
+  updateAddressService,
 };
