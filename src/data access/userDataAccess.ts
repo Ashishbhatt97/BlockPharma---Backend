@@ -1,13 +1,12 @@
-import prisma from "../config/db.config";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import prisma from "../config/db.config";
+import { tokenGenerator } from "../middleware/middlewares";
 import {
   RegisterSchemaType,
   loginSchemaType,
   updateUserSchemaType,
 } from "../models/Users";
 require("dotenv").config();
-import { tokenGenerator } from "../middleware/middlewares";
 
 const SECRET = process.env.SECRET_KEY;
 
@@ -141,11 +140,7 @@ const updateUserDetails = async (
 ) => {
   try {
     // Check if the user exists
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const existingUser = await getUserById(userId);
 
     if (!existingUser) {
       return {
@@ -193,11 +188,7 @@ const updateUserDetails = async (
 const upgradeUser = async (userId: string, userObj: updateUserSchemaType) => {
   try {
     // Check if the user exists
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const existingUser = await getUserById(userId);
 
     if (!existingUser) {
       return {
@@ -223,7 +214,7 @@ const upgradeUser = async (userId: string, userObj: updateUserSchemaType) => {
       status: 200,
       data: {
         status: true,
-        message: "Congratulation!! You are Upgraded to Supplier",
+        message: `Congratulation!! You are Upgraded to ${userObj.role}`,
         user: updatedUser,
       },
     };
@@ -244,17 +235,18 @@ const changePassword = async (
   newPassword: string
 ) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    });
+    const user = await getUserById(userId);
     if (!user) return null;
 
-    if (user) {
-      const isValidPassword = bcrypt.compare(oldPassword, user.password);
+    const isValidPassword = await bcrypt.compare(oldPassword, user.password);
 
-      if (!isValidPassword) return null;
+    if (!isValidPassword) {
+      return {
+        status: 400,
+        data: {
+          message: "Invalid old password",
+        },
+      };
     }
 
     //Hashed New Password
@@ -268,7 +260,6 @@ const changePassword = async (
         password: hashedNewPassword,
       },
     });
-    console.log(passwordRes);
     if (!passwordRes) {
       return {
         status: false,
@@ -295,6 +286,71 @@ const changePassword = async (
   }
 };
 
+const deleteUser = async (userId: string) => {
+  try {
+    const user = await getUserById(userId);
+    if (!user) return null;
+
+    const deletedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    if (!deletedUser) {
+      return {
+        status: 400,
+        data: {
+          status: false,
+          message: "Error deleting user",
+        },
+      };
+    }
+
+    return {
+      status: 200,
+      data: {
+        status: true,
+        message: "User deleted successfully",
+      },
+    };
+  } catch (error: any) {
+    return {
+      status: 400,
+      data: {
+        message: error.message,
+      },
+    };
+  }
+};
+
+const getUserById = async (userId: string) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user || user!.isDeleted === true) {
+      return null;
+    }
+
+    return user;
+  } catch (error: any) {
+    return null;
+  }
+};
+
+const isUserDeleted = async (userId: string) => {
+  const user = await getUserById(userId);
+  if (!user) return null;
+  return user.isDeleted;
+};
+
 export default {
   createUser,
   findUserByEmail,
@@ -302,4 +358,7 @@ export default {
   updateUserDetails,
   upgradeUser,
   changePassword,
+  deleteUser,
+  getUserById,
+  isUserDeleted,
 };

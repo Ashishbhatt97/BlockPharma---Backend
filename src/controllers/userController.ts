@@ -29,7 +29,7 @@ const userRegister = asyncHandler(async (req: Request, res: Response) => {
 
   let result = await userServices.userRegisterService(validatedData);
 
-  sendResponse(res, result!.status, result.data);
+  sendResponse(res, result!.status, result);
 });
 
 // @desc    User Login Handler
@@ -126,10 +126,44 @@ const changePassword = asyncHandler(
     );
 
     if (result?.status !== undefined) {
-      sendResponse(res, result?.status, result.data);
+      sendResponse(res, result?.status, result);
     }
   }
 );
+
+// @desc    User delete
+// @route   /api/user/delete
+// @access  DELETE
+const deleteUser = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, { message: "Unauthorized" });
+  }
+
+  const { id } = req.user;
+
+  const result = await userServices.deleteUserService(id);
+
+  if (result?.status !== undefined) {
+    sendResponse(res, result.status, result);
+  }
+});
+
+// @desc    Get User by Id
+// @route   /api/user/getdetails
+// @access  GET
+const getUserById = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, { message: "Unauthorized" });
+  }
+
+  const { id } = req.user;
+
+  const result = await userServices.getUserByIdService(id);
+
+  if (result?.status !== undefined) {
+    sendResponse(res, result.status, result);
+  }
+});
 
 export default {
   userRegister,
@@ -137,4 +171,6 @@ export default {
   updateUserDetails,
   upgradeUser,
   changePassword,
+  deleteUser,
+  getUserById,
 };
