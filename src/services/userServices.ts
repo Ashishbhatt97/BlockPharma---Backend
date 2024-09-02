@@ -5,6 +5,7 @@ import {
   RegisterSchemaType,
   updateUserSchemaType,
 } from "../models/Users";
+import { AddressSchemaType } from "../models/Address";
 
 // User Registration Service
 const userRegisterService = async (userObj: RegisterSchemaType) => {
@@ -245,6 +246,30 @@ const getUserByIdService = async (userId: string) => {
   }
 };
 
+//Add Address Service
+const addAddressService = async (
+  userId: string,
+  addressObj: AddressSchemaType
+) => {
+  const res = await userDataAccess.addAddress(userId, addressObj);
+  if (!res) {
+    return {
+      status: 400,
+      error: "Error adding address",
+    };
+  }
+
+  if (res.status === 200) {
+    return {
+      status: 200,
+      message: res.message,
+      data: {
+        address: res,
+      },
+    };
+  }
+};
+
 export default {
   userRegisterService,
   userLoginService,
@@ -253,4 +278,5 @@ export default {
   changePasswordService,
   deleteUserService,
   getUserByIdService,
+  addAddressService,
 };

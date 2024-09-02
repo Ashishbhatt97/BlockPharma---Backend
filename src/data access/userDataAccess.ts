@@ -6,6 +6,7 @@ import {
   loginSchemaType,
   updateUserSchemaType,
 } from "../models/Users";
+import { AddressSchemaType } from "../models/Address";
 require("dotenv").config();
 
 const SECRET = process.env.SECRET_KEY;
@@ -333,6 +334,9 @@ const getUserById = async (userId: string) => {
       where: {
         id: userId,
       },
+      include: {
+        Addresses: true,
+      },
     });
 
     if (!user || user!.isDeleted === true) {
@@ -351,6 +355,44 @@ const isUserDeleted = async (userId: string) => {
   return user.isDeleted;
 };
 
+const addAddress = async (userId: string, addressObj: AddressSchemaType) => {
+  try {
+    const user = await getUserById(userId);
+    if (!user) return null;
+
+    const newAddress = await prisma.address.create({
+      data: {
+        street: addressObj.street,
+        city: addressObj.city,
+        state: addressObj.state,
+        country: addressObj.country,
+        zipCode: addressObj.zipCode,
+        userId: userId,
+      },
+    });
+
+    if (!newAddress) {
+      return {
+        status: 400,
+        message: "Failed to add address",
+      };
+    }
+
+    return {
+      status: 200,
+      message: "Address added successfully",
+      data: {
+        address: newAddress,
+      },
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      error: error.message,
+    };
+  }
+};
+
 export default {
   createUser,
   findUserByEmail,
@@ -361,4 +403,5 @@ export default {
   deleteUser,
   getUserById,
   isUserDeleted,
+  addAddress,
 };

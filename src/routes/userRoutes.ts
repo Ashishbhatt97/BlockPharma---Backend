@@ -14,4 +14,6 @@ router
   .put(jwtAuth as any, userController.changePassword);
 router.delete("/delete", jwtAuth as any, userController.deleteUser);
 router.get("/getdetails", jwtAuth as any, userController.getUserById);
+router.post("/addAddress", jwtAuth as any, userController.addAddress);
+
 export default router;
