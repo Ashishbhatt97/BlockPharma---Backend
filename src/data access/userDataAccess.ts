@@ -338,7 +338,7 @@ const getUserById = async (userId: string) => {
         id: userId,
       },
       include: {
-        Addresses: true,
+        Address: true,
       },
     });
 

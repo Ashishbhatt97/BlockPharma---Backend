@@ -14,20 +14,22 @@ datasource db {
 }
 
 model User {
-  id          String    @id @default(uuid())
-  firstName   String
-  lastName    String
-  email       String    @unique
-  password    String
-  role        Role      @default(USER)
-  phoneNumber String
-  profilePic  String?
-  oAuthId     String?
-  provider    String?
-  isDeleted   Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  Addresses   Address[]
+  id                 String               @id @default(uuid())
+  firstName          String
+  lastName           String
+  email              String               @unique
+  password           String
+  role               Role                 @default(USER)
+  phoneNumber        String
+  profilePic         String?
+  oAuthId            String?
+  provider           String?
+  isDeleted          Boolean              @default(false)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Address            Address?
+  VendorOwner        VendorOwner?
+  VendorOrganization VendorOrganization[]
 }
 
 enum Role {
@@ -48,4 +50,31 @@ model Address {
   zipCode   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model VendorOwner {
+  vendorId            BigInt               @id @default(autoincrement())
+  userId              String               @unique
+  VendorOrganizations VendorOrganization[]
+  user                User                 @relation(fields: [userId], references: [id])
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+model VendorOrganization {
+  orgId         BigInt      @id @default(autoincrement())
+  vendorOwnerId BigInt
+  businessName  String
+  gstin         String      @unique
+  email         String      @unique
+  street        String
+  city          String
+  state         String
+  pincode       Int
+  isActive      Boolean     @default(true)
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  VendorOwner   VendorOwner @relation(fields: [vendorOwnerId], references: [vendorId])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 }
