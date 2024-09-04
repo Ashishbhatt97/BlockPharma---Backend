@@ -7,16 +7,14 @@ const router: Router = express.Router();
 // user routes
 router.post("/register", userController.userRegister);
 router.post("/login", userController.userLogin);
-router.route("/update").put(jwtAuth as any, userController.updateUserDetails);
-router.route("/upgradeUser").put(jwtAuth as any, userController.upgradeUser);
-router
-  .route("/changepassword")
-  .put(jwtAuth as any, userController.changePassword);
-router.delete("/delete", jwtAuth as any, userController.deleteUser);
-router.get("/getdetails", jwtAuth as any, userController.getUserById);
+router.route("/update").put(jwtAuth, userController.updateUserDetails);
+router.route("/upgradeUser").put(jwtAuth, userController.upgradeUser);
+router.route("/changepassword").put(jwtAuth, userController.changePassword);
+router.delete("/delete", jwtAuth, userController.deleteUser);
+router.get("/getdetails", jwtAuth, userController.getUserById);
 
 //Address Routes
-router.post("/addAddress", jwtAuth as any, userController.addAddress);
-router.put("/updateAddress", jwtAuth as any, userController.updateAddress);
+router.post("/addAddress", jwtAuth, userController.addAddress);
+router.put("/updateAddress", jwtAuth, userController.updateAddress);
 
 export default router;

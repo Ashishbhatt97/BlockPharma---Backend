@@ -230,10 +230,8 @@ const getUserByIdService = async (userId: string) => {
     if (res) {
       return {
         status: 200,
-        data: {
-          message: "User fetched successfully",
-          user: res,
-        },
+        message: "User fetched successfully",
+        data: res,
       };
     }
   } catch (error) {
@@ -285,9 +283,7 @@ const updateAddressService = async (
     return {
       status: 200,
       message: res.message,
-      data: {
-        address: res,
-      },
+      data: res.data,
     };
   }
 };

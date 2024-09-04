@@ -7,6 +7,7 @@ import {
   updateUserSchemaType,
 } from "../models/Users";
 import { AddressSchemaType } from "../models/Address";
+import convertBigIntToString from "../helper/convertBigIntToString";
 require("dotenv").config();
 
 const SECRET = process.env.SECRET_KEY;
@@ -338,15 +339,19 @@ const getUserById = async (userId: string) => {
         id: userId,
       },
       include: {
-        Addresses: true,
+        Address: true,
+        VendorOrganization: true,
       },
     });
 
     if (!user || user!.isDeleted === true) {
       return null;
     }
+    const userData = convertBigIntToString(user);
 
-    return user;
+    console.log(userData);
+
+    return userData;
   } catch (error: any) {
     return null;
   }

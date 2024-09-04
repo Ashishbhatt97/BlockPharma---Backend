@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
-import { userRoutes } from "./routes/routes";
+import { userRoutes, vendorRoutes } from "./routes/routes";
 import bodyParser from "body-parser";
 require("dotenv").config();
 
@@ -20,6 +20,7 @@ app.use(cors());
 
 // Routes
 app.use("/api/user", userRoutes);
+app.use("/api/vendor", vendorRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

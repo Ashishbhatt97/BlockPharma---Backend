@@ -1,3 +1,4 @@
 import userServices from "./userServices";
+import vendorServices from "./vendorServices";
 
-export { userServices };
+export { userServices, vendorServices };
