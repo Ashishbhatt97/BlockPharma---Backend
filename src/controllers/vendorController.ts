@@ -94,9 +94,59 @@ const addOrganization = asyncHandler(
   }
 );
 
+// @desc    Get Organization
+// @route   /api/vendor/getOrganization
+// @access  GET
+const getOrganization = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const orgId = req.query.orgId;
+
+    if (!orgId) {
+      return sendResponse(res, 400, { message: "Organization ID is required" });
+    }
+
+    const result = await vendorServices.getOrganizationService(Number(orgId));
+
+    if (result && result.status !== undefined) {
+      sendResponse(res, result.status, result);
+    }
+  }
+);
+
+// @desc    Delete Organization
+// @route   /api/vendor/deleteOrganization
+// @access  DELETE
+const deleteOrganization = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const orgId = req.query.orgId;
+
+    if (!orgId) {
+      return sendResponse(res, 400, { message: "Organization ID is required" });
+    }
+
+    const result = await vendorServices.deleteOrganizationService(
+      Number(orgId)
+    );
+
+    if (result && result.status !== undefined) {
+      sendResponse(res, result.status, result);
+    }
+  }
+);
+
 export default {
   addVendor,
   deleteVendor,
   getVendor,
   addOrganization,
+  getOrganization,
+  deleteOrganization,
 };
