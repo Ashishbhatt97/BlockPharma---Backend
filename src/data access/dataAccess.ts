@@ -1,4 +1,4 @@
 import userDataAccess from "./userDataAccess";
-import vendorDataAccess from "./vendorDataAccess.ts";
+import vendorDataAccess from "./vendorDataAccess";
 
 export { userDataAccess, vendorDataAccess };

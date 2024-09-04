@@ -43,12 +43,11 @@ export const VendorOrganizationSchema = z.object({
 });
 
 export const VendorOwnerSchema = z.object({
-  vendorId: z
-    .string()
-    .uuid({ message: "Invalid vendor ID format. Must be a UUID." }),
+  vendorId: z.bigint().optional(),
   userId: z
     .string()
-    .uuid({ message: "Invalid user ID format. Must be a UUID." }),
+    .uuid({ message: "Invalid user ID format. Must be a UUID." })
+    .optional(),
   VendorOrganizations: z
     .array(
       z.string().uuid({
