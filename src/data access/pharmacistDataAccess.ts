@@ -1,6 +1,9 @@
 import prisma from "../config/db.config";
 import convertBigIntToString from "../helper/convertBigIntToString";
-import { PharmacyOutletType } from "../models/Pharmacy";
+import {
+  PharmacyOutletType,
+  UpdatePharmacyOutletType,
+} from "../models/Pharmacy";
 
 // Add Pharmacist
 const addPharmacist = async (userId: string) => {
@@ -312,6 +315,80 @@ const deletePharmacyOutlet = async (pharmacyOutletId: number) => {
   }
 };
 
+// Get All Pharmacy Outlets
+const getAllPharmacyOutlets = async () => {
+  try {
+    const pharmacyOutlets = await prisma.pharmacyOutlet.findMany({
+      select: {
+        pharmacyOutletId: true,
+        gstin: true,
+        email: true,
+        phoneNumber: true,
+        street: true,
+        city: true,
+        state: true,
+        pincode: true,
+      },
+    });
+
+    const data = convertBigIntToString(pharmacyOutlets);
+
+    return {
+      status: 200,
+      message: "Pharmacy outlets fetched successfully",
+      data,
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
+// Update Pharmacy Outlet
+const updatePharmacyOutlet = async (
+  pharmacyOutletId: number,
+  validatedSchema: UpdatePharmacyOutletType
+) => {
+  try {
+    const existingPharmacyOutlet = await prisma.pharmacyOutlet.findUnique({
+      where: {
+        pharmacyOutletId: BigInt(pharmacyOutletId),
+      },
+    });
+
+    if (!existingPharmacyOutlet) {
+      return {
+        status: 404,
+        message: "Pharmacy outlet not found",
+      };
+    }
+
+    const pharmacyOutlet = await prisma.pharmacyOutlet.update({
+      where: {
+        pharmacyOutletId: BigInt(pharmacyOutletId),
+      },
+      data: {
+        ...validatedSchema,
+      },
+    });
+
+    const data = convertBigIntToString(pharmacyOutlet);
+
+    return {
+      status: 200,
+      message: "Pharmacy outlet updated successfully",
+      data,
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
 export default {
   addPharmacist,
   getPharmacist,
@@ -321,4 +398,6 @@ export default {
   addPharmacyOutlet,
   getPharmacyOutletById,
   deletePharmacyOutlet,
+  getAllPharmacyOutlets,
+  updatePharmacyOutlet,
 };

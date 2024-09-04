@@ -1,3 +1,4 @@
+import AddressSchema from "./Address";
 import {
   loginSchema,
   signupSchema,
@@ -24,4 +25,5 @@ export {
   loginSchemaType,
   updateUserSchema,
   updateUserSchemaType,
+  AddressSchema,
 };

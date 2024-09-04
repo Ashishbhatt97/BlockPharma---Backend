@@ -1,5 +1,8 @@
 import { pharmacistDataAccess } from "../data access/dataAccess";
-import { PharmacyOutletType } from "../models/Pharmacy";
+import {
+  PharmacyOutletType,
+  UpdatePharmacyOutletType,
+} from "../models/Pharmacy";
 
 const addPharmacistService = async (id: string) => {
   const res = await pharmacistDataAccess.addPharmacist(id);
@@ -121,6 +124,47 @@ const deletePharmacyOutletService = async (pharmacyOutletId: number) => {
   }
 };
 
+const getAllPharmacyOutletsService = async () => {
+  const res = await pharmacistDataAccess.getAllPharmacyOutlets();
+  if (!res || res.status === 400 || res.status === 500) {
+    return {
+      status: res.status,
+      error: res.message,
+    };
+  }
+  if (res.status === 200) {
+    return {
+      status: 200,
+      data: res.data,
+    };
+  }
+};
+
+const updatePharmacyOutletService = async (
+  pharmacyOutletId: number,
+  validatedSchema: UpdatePharmacyOutletType
+) => {
+  const res = await pharmacistDataAccess.updatePharmacyOutlet(
+    pharmacyOutletId,
+    validatedSchema
+  );
+
+  if (!res || res.status === 404 || res.status === 400 || res.status === 500) {
+    return {
+      status: res.status,
+      error: res.message,
+    };
+  }
+
+  if (res.status === 200) {
+    return {
+      status: 200,
+      message: res.message,
+      data: res.data,
+    };
+  }
+};
+
 export default {
   addPharmacistService,
   getAllPharmacistsService,
@@ -129,4 +173,6 @@ export default {
   addPharmacyOutletService,
   getPharmacyOutletByIdService,
   deletePharmacyOutletService,
+  getAllPharmacyOutletsService,
+  updatePharmacyOutletService,
 };

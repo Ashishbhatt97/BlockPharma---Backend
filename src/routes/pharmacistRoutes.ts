@@ -13,11 +13,20 @@ router.delete("/delete", jwtAuth, pharmacistController.deletePharmacist);
 //Pharmacy Outlet Routes
 router.post("/outlet/add", jwtAuth, pharmacistController.addPharmacyOutlet);
 router.get("/outlet/get", jwtAuth, pharmacistController.getPharmacyOutletById);
-// router.get("/outlet/getall", jwtAuth, pharmacistController.getAllPharmacyOutlets);
+router.get(
+  "/outlet/getall",
+  jwtAuth,
+  pharmacistController.getAllPharmacyOutlets
+);
 router.delete(
   "/outlet/delete",
   jwtAuth,
   pharmacistController.deletePharmacyOutlet
+);
+router.put(
+  "/outlet/update",
+  jwtAuth,
+  pharmacistController.updatePharmacyOutlet
 );
 
 export default router;

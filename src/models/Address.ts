@@ -13,17 +13,6 @@ const AddressSchema = z.object({
   userId: z.string().uuid().optional(),
 });
 
-// Example usage:
-// const parsedAddress = AddressSchema.parse({
-//   id: "some-uuid",
-//   street: "123 Main St",
-//   city: "Anytown",
-//   state: "Anystate",
-//   country: "Country",
-//   zipCode: "12345",
-//   userId: "user-uuid",
-// });
-
 export type AddressSchemaType = z.infer<typeof AddressSchema>;
 
 export default AddressSchema;

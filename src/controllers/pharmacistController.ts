@@ -4,7 +4,12 @@ import asyncHandler from "../middleware/asyncHandler";
 import { CustomRequest } from "../middleware/jwtAuthentication";
 
 import { pharmacistServices } from "../services/services";
-import { pharmacyOutletSchema, PharmacyOutletType } from "../models/Pharmacy";
+import {
+  pharmacyOutletSchema,
+  PharmacyOutletType,
+  updatePharmacyOutletSchema,
+  UpdatePharmacyOutletType,
+} from "../models/Pharmacy";
 
 // @desc    Add Pharmacist
 // @route   /api/pharmacist/add
@@ -164,6 +169,56 @@ const deletePharmacyOutlet = asyncHandler(
   }
 );
 
+// @desc    Get All Pharmacy Outlets
+// @route   /api/pharmacist/outlet/getall
+// @access  GET
+const getAllPharmacyOutlets = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    const result = await pharmacistServices.getAllPharmacyOutletsService();
+
+    if (!result || result.status !== undefined) {
+      sendResponse(res, result!.status, result);
+    }
+  }
+);
+
+// @desc    Update Pharmacy Outlet
+// @route   /api/pharmacist/outlet/update
+// @access  PUT
+const updatePharmacyOutlet = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, {
+        status: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const pharmacyOutletId = req.query.pharmacyOutletId;
+    const validatedPharmacySchema = updatePharmacyOutletSchema.safeParse(
+      req.body
+    );
+
+    if (validatedPharmacySchema.error) {
+      return sendResponse(res, 400, {
+        message: validatedPharmacySchema.error.message,
+      });
+    }
+
+    const validatedSchema: UpdatePharmacyOutletType =
+      validatedPharmacySchema.data;
+
+    const result = await pharmacistServices.updatePharmacyOutletService(
+      Number(pharmacyOutletId),
+      validatedSchema
+    );
+
+    if (!result || result.status !== undefined) {
+      sendResponse(res, result!.status, result);
+    }
+  }
+);
+
 export default {
   addPharmacist,
   getAllPharmacists,
@@ -172,4 +227,6 @@ export default {
   addPharmacyOutlet,
   getPharmacyOutletById,
   deletePharmacyOutlet,
+  getAllPharmacyOutlets,
+  updatePharmacyOutlet,
 };
