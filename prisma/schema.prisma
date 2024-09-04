@@ -30,6 +30,8 @@ model User {
   Address            Address?
   VendorOwner        VendorOwner?
   VendorOrganization VendorOrganization[]
+  Pharmacist         Pharmacist?
+  PharmacyOutlet     PharmacyOutlet[]
 }
 
 enum Role {
@@ -73,10 +75,39 @@ model VendorOrganization {
   pincode       Int
   isActive      Boolean     @default(true)
   phoneNumber   String
-  website       String
+  website       String?
   userId        String
   user          User        @relation(fields: [userId], references: [id])
   VendorOwner   VendorOwner @relation(fields: [vendorOwnerId], references: [vendorId])
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+model Pharmacist {
+  pharmacistId    BigInt           @id @default(autoincrement())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id])
+  pharmacyOutlets PharmacyOutlet[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+}
+
+model PharmacyOutlet {
+  pharmacyOutletId  BigInt     @id @default(autoincrement())
+  pharmacistOwnerId BigInt
+  businessName      String
+  street            String
+  city              String
+  state             String
+  pincode           Int
+  phoneNumber       String
+  gstin             String     @unique
+  email             String     @unique
+  website           String?
+  userId            String
+  user              User       @relation(fields: [userId], references: [id])
+  pharmacist        Pharmacist @relation(fields: [pharmacistOwnerId], references: [pharmacistId])
+  isActive          Boolean    @default(true)
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 }

@@ -1,14 +1,12 @@
-import { Request, Response } from "express";
-import asyncHandler from "../middleware/asyncHandler";
+import { Response } from "express";
 import sendResponse from "../helper/responseHelper";
-import { vendorServices } from "../services/services";
+import asyncHandler from "../middleware/asyncHandler";
 import { CustomRequest } from "../middleware/jwtAuthentication";
 import {
   VendorOrganizationSchema,
   VendorOrganizationSchemaType,
-  VendorOwnerSchema,
-  VendorSchemaType,
 } from "../models/Vendor";
+import { vendorServices } from "../services/services";
 
 // @desc    Add Vendor
 // @route   /api/vendor/addVendor
@@ -70,7 +68,6 @@ const addOrganization = asyncHandler(
       return sendResponse(res, 401, { message: "Unauthorized" });
     }
     const { id } = req.user;
-    console.log(req.body);
 
     const validateOrganization = VendorOrganizationSchema.safeParse(req.body);
 
