@@ -1,13 +1,20 @@
 import express, { Router } from "express";
 import userController from "../controllers/controllers";
 import { jwtAuth } from "../middleware/middlewares";
+import upload from "../config/upload.config";
 
 const router: Router = express.Router();
 
 // user routes
-router.post("/register", userController.userRegister);
+router.post(
+  "/register",
+  upload.single("profilePic"),
+  userController.userRegister
+);
 router.post("/login", userController.userLogin);
-router.route("/update").put(jwtAuth, userController.updateUserDetails);
+router
+  .route("/update")
+  .put(jwtAuth, upload.single("profilePic"), userController.updateUserDetails);
 router.route("/upgradeUser").put(jwtAuth, userController.upgradeUser);
 router.route("/changepassword").put(jwtAuth, userController.changePassword);
 router.delete("/delete", jwtAuth, userController.deleteUser);

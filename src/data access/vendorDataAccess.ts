@@ -234,9 +234,70 @@ const addOrganization = async (
   }
 };
 
+// Get Organization
+const getOrganization = async (orgId: number) => {
+  try {
+    const organization = await prisma.vendorOrganization.findUnique({
+      where: {
+        orgId: BigInt(orgId),
+      },
+    });
+
+    if (!organization) {
+      return {
+        status: 400,
+        message: "Organization not found",
+      };
+    }
+
+    const data = convertBigIntToString(organization);
+
+    return {
+      status: 200,
+      message: "Organization found",
+      data: data,
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
+// Delete Organization
+const deleteOrganization = async (orgId: number) => {
+  try {
+    const organization = await prisma.vendorOrganization.delete({
+      where: {
+        orgId: BigInt(orgId),
+      },
+    });
+
+    if (!organization) {
+      return {
+        status: 400,
+        message: "Organization not found",
+      };
+    }
+
+    return {
+      status: 200,
+      message: "Organization deleted successfully",
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
 export default {
   addVendor,
   deleteVendor,
   getVendor,
   addOrganization,
+  getOrganization,
+  deleteOrganization,
 };

@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
-import asyncHandler from "../middleware/asyncHandler";
 import sendResponse from "../helper/responseHelper";
-import { userServices } from "../services/services";
-import {
-  signupSchema,
-  loginSchemaType,
-  loginSchema,
-  RegisterSchemaType,
-  updateUserSchemaType,
-  updateUserSchema,
-} from "../models/Users";
+import asyncHandler from "../middleware/asyncHandler";
 import { CustomRequest } from "../middleware/jwtAuthentication";
 import AddressSchema, { AddressSchemaType } from "../models/Address";
+import {
+  loginSchema,
+  loginSchemaType,
+  RegisterSchemaType,
+  signupSchema,
+  updateUserSchema,
+  updateUserSchemaType,
+} from "../models/Users";
+import { userServices } from "../services/services";
 
 // @desc    User Registration
 // @route   /api/user/register
@@ -27,6 +27,11 @@ const userRegister = asyncHandler(async (req: Request, res: Response) => {
 
   // Extract validated data
   const validatedData: RegisterSchemaType = parseResult.data;
+
+  // Add profile picture file path if it exists
+  if (req.file) {
+    validatedData.profilePic = `/uploads/profilePics/${req.file.filename}`;
+  }
 
   let result = await userServices.userRegisterService(validatedData);
 
@@ -73,6 +78,11 @@ const updateUserDetails = asyncHandler(
     }
 
     const validatedData: updateUserSchemaType = parseResult.data;
+
+    // Add profile picture file path if it exists
+    if (req.file) {
+      validatedData.profilePic = `/uploads/profilePics/${req.file.filename}`;
+    }
 
     const result = await userServices.updateUserDetailsService(
       id,

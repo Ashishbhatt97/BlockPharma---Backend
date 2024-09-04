@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import cors from "cors";
-import { userRoutes, vendorRoutes } from "./routes/routes";
+import { userRoutes, vendorRoutes, pharmacistRoutes } from "./routes/routes";
 import bodyParser from "body-parser";
 require("dotenv").config();
 
@@ -18,9 +18,13 @@ app.use(
 // Enable CORS
 app.use(cors());
 
+// Static file serving (e.g., profile pictures)
+app.use("/uploads", express.static("uploads"));
+
 // Routes
 app.use("/api/user", userRoutes);
 app.use("/api/vendor", vendorRoutes);
+app.use("/api/pharmacist", pharmacistRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

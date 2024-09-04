@@ -86,9 +86,49 @@ const addOrganizationService = async (
   }
 };
 
+// Get Organization Service
+const getOrganizationService = async (orgId: number) => {
+  const res = await vendorDataAccess.getOrganization(orgId);
+
+  if (!res || res.status === 400 || res.status === 500) {
+    return {
+      status: 400,
+      error: res.message,
+    };
+  }
+
+  if (res) {
+    return {
+      status: 200,
+      message: res.message,
+      data: res.data,
+    };
+  }
+};
+
+const deleteOrganizationService = async (orgId: number) => {
+  const res = await vendorDataAccess.deleteOrganization(orgId);
+
+  if (!res || res.status === 400) {
+    return {
+      status: 400,
+      error: res.message,
+    };
+  }
+
+  if (res.status === 200) {
+    return {
+      status: 200,
+      message: res.message,
+    };
+  }
+};
+
 export default {
   addVendorService,
   deleteVendorService,
   getVendorService,
   addOrganizationService,
+  getOrganizationService,
+  deleteOrganizationService,
 };

@@ -1,14 +1,12 @@
-import { Request, Response } from "express";
-import asyncHandler from "../middleware/asyncHandler";
+import { Response } from "express";
 import sendResponse from "../helper/responseHelper";
-import { vendorServices } from "../services/services";
+import asyncHandler from "../middleware/asyncHandler";
 import { CustomRequest } from "../middleware/jwtAuthentication";
 import {
   VendorOrganizationSchema,
   VendorOrganizationSchemaType,
-  VendorOwnerSchema,
-  VendorSchemaType,
 } from "../models/Vendor";
+import { vendorServices } from "../services/services";
 
 // @desc    Add Vendor
 // @route   /api/vendor/addVendor
@@ -70,7 +68,6 @@ const addOrganization = asyncHandler(
       return sendResponse(res, 401, { message: "Unauthorized" });
     }
     const { id } = req.user;
-    console.log(req.body);
 
     const validateOrganization = VendorOrganizationSchema.safeParse(req.body);
 
@@ -94,9 +91,59 @@ const addOrganization = asyncHandler(
   }
 );
 
+// @desc    Get Organization
+// @route   /api/vendor/getOrganization
+// @access  GET
+const getOrganization = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const orgId = req.query.orgId;
+
+    if (!orgId) {
+      return sendResponse(res, 400, { message: "Organization ID is required" });
+    }
+
+    const result = await vendorServices.getOrganizationService(Number(orgId));
+
+    if (result && result.status !== undefined) {
+      sendResponse(res, result.status, result);
+    }
+  }
+);
+
+// @desc    Delete Organization
+// @route   /api/vendor/deleteOrganization
+// @access  DELETE
+const deleteOrganization = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+
+    const orgId = req.query.orgId;
+
+    if (!orgId) {
+      return sendResponse(res, 400, { message: "Organization ID is required" });
+    }
+
+    const result = await vendorServices.deleteOrganizationService(
+      Number(orgId)
+    );
+
+    if (result && result.status !== undefined) {
+      sendResponse(res, result.status, result);
+    }
+  }
+);
+
 export default {
   addVendor,
   deleteVendor,
   getVendor,
   addOrganization,
+  getOrganization,
+  deleteOrganization,
 };
