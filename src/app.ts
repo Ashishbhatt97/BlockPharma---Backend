@@ -18,6 +18,9 @@ app.use(
 // Enable CORS
 app.use(cors());
 
+// Static file serving (e.g., profile pictures)
+app.use("/uploads", express.static("uploads"));
+
 // Routes
 app.use("/api/user", userRoutes);
 app.use("/api/vendor", vendorRoutes);

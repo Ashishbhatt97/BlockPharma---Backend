@@ -28,6 +28,11 @@ const userRegister = asyncHandler(async (req: Request, res: Response) => {
   // Extract validated data
   const validatedData: RegisterSchemaType = parseResult.data;
 
+  // Add profile picture file path if it exists
+  if (req.file) {
+    validatedData.profilePic = `/uploads/profilePics/${req.file.filename}`;
+  }
+
   let result = await userServices.userRegisterService(validatedData);
 
   sendResponse(res, result!.status, result);
@@ -73,6 +78,11 @@ const updateUserDetails = asyncHandler(
     }
 
     const validatedData: updateUserSchemaType = parseResult.data;
+
+    // Add profile picture file path if it exists
+    if (req.file) {
+      validatedData.profilePic = `/uploads/profilePics/${req.file.filename}`;
+    }
 
     const result = await userServices.updateUserDetailsService(
       id,
