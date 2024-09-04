@@ -1,6 +1,6 @@
 import prisma from "../config/db.config";
-import convertBigIntToString from "../helper/convertBigIntToString";
 import { VendorOrganizationSchemaType } from "../models/Vendor";
+import convertBigIntToString from "./convertBigIntToString";
 
 // Add Vendor
 const addVendor = async (userId: string) => {
@@ -54,30 +54,33 @@ const addVendor = async (userId: string) => {
 
 // Get Vendor
 const getVendor = async (userId: string) => {
+  console.log(userId);
+
   try {
-    const vendor = await prisma.vendorOwner.findUnique({
+    await prisma.vendorOwner.findUnique({
       where: {
-        userId: userId,
-      },
-      include: {
-        VendorOrganizations: true,
+        userId,
       },
     });
 
-    if (!vendor) {
-      return {
-        status: 400,
-        message: "Vendor not found",
-      };
-    }
+    // if (!vendor) {
+    //   return {
+    //     status: 400,
+    //     message: "Vendor not found",
+    //   };
+    // }
 
     // Ensure BigInt is serialized correctly
-    const data = convertBigIntToString(vendor);
+    // const data = vendor
+    //   ? {
+    //       ...vendor,
+    //       vendorId: vendor.vendorId.toString(), // Convert BigInt to string
+    //     }
+    //   : null;
 
     return {
       status: 200,
       message: "Vendor found",
-      data: data,
     };
   } catch (error: any) {
     return {
@@ -150,61 +153,33 @@ const addOrganization = async (
       };
     }
 
-    const emailExists = await prisma.vendorOrganization.findUnique({
-      where: {
-        email: validatedSchema.email,
-      },
-    });
-
-    if (emailExists) {
-      return {
-        status: 400,
-        message: "Email already exists",
-      };
-    }
-
-    const gstinExists = await prisma.vendorOrganization.findUnique({
-      where: {
-        gstin: validatedSchema.gstin,
-      },
-    });
-
-    if (gstinExists) {
-      return {
-        status: 400,
-        message: "GSTIN already exists",
-      };
-    }
-
-    const vendorOwnerId = vendorExists.vendorId
+    const vendorId = vendorExists.vendorId
       ? BigInt(vendorExists.vendorId)
-      : undefined;
+      : null;
 
-    if (!vendorOwnerId) {
-      return {
-        status: 400,
-        message: "Vendor not found",
-      };
-    }
-
-    const userID = vendorExists.userId;
+    const organizationData: any = {
+      vendorOwnerId: vendorId,
+      businessName: validatedSchema.businessName,
+      gstin: validatedSchema.gstin,
+      email: validatedSchema.email,
+      street: validatedSchema.street,
+      city: validatedSchema.city,
+      state: validatedSchema.state,
+      pincode: Number(validatedSchema.pincode),
+      isActive: validatedSchema.isActive ?? true,
+      phoneNumber: validatedSchema.phoneNumber,
+      website: validatedSchema.website,
+    };
 
     const organization = await prisma.vendorOrganization.create({
-      data: {
-        vendorOwnerId,
-        phoneNumber: validatedSchema.phoneNumber,
-        website: validatedSchema.website || "",
-        userId: userID,
-        businessName: validatedSchema.businessName,
-        gstin: validatedSchema.gstin,
-        email: validatedSchema.email,
-        street: validatedSchema.street,
-        city: validatedSchema.city,
-        state: validatedSchema.state,
-        pincode: Number(validatedSchema.pincode),
-        isActive: validatedSchema.isActive ?? true,
-      },
+      data: organizationData,
     });
+
+    // If you need to return this as JSON, convert BigInt to string
+    const organizationResponse = {
+      ...organization,
+      vendorOwnerId: organization.vendorOwnerId.toString(), // Convert BigInt to string if necessary
+    };
 
     if (!organization) {
       return {
@@ -213,18 +188,10 @@ const addOrganization = async (
       };
     }
 
-    const data = organization
-      ? {
-          ...organization,
-          orgId: organization.orgId.toString(),
-          vendorOwnerId: organization.vendorOwnerId.toString(),
-        }
-      : null;
-
     return {
       status: 201,
       message: "Organization added successfully",
-      data: data,
+      data: organizationResponse,
     };
   } catch (error: any) {
     return {

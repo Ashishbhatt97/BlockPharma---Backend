@@ -1,4 +1,7 @@
-import { VendorSchemaType } from "../models/models";
+import {
+  VendorOrganizationSchemaType,
+  VendorSchemaType,
+} from "../models/models";
 import vendorDataAccess from "../data access/vendorDataAccess";
 
 // Add Vendor Service
@@ -60,8 +63,32 @@ const deleteVendorService = async (userId: string) => {
   }
 };
 
+// Add Organization Service
+const addOrganizationService = async (
+  userId: string,
+  validatedSchema: VendorOrganizationSchemaType
+) => {
+  const res = await vendorDataAccess.addOrganization(userId, validatedSchema);
+
+  if (!res || res.status === 400 || res.status === 500) {
+    return {
+      status: 400,
+      error: res.message,
+    };
+  }
+
+  if (res) {
+    return {
+      status: 201,
+      message: res.message,
+      data: res.data,
+    };
+  }
+};
+
 export default {
   addVendorService,
   deleteVendorService,
   getVendorService,
+  addOrganizationService,
 };

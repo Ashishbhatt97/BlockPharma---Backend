@@ -1,15 +1,12 @@
 import { z } from "zod";
 
 export const VendorOrganizationSchema = z.object({
-  orgId: z
-    .string()
-    .uuid({ message: "Invalid organization ID format. Must be a UUID." }),
-  vendorOwnerId: z
-    .string()
-    .uuid({ message: "Invalid vendor owner ID format. Must be a UUID." }),
+  orgId: z.bigint().optional(),
+  vendorOwnerId: z.bigint().optional(),
   userId: z
     .string()
-    .uuid({ message: "Invalid user ID format. Must be a UUID." }),
+    .uuid({ message: "Invalid user ID format. Must be a UUID." })
+    .optional(),
   businessName: z
     .string()
     .min(1, { message: "Business name cannot be empty." })

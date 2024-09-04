@@ -20,10 +20,20 @@ export interface AddressType {
   userId: string;
 }
 
+export interface VendorOrganizationSchemaType {
+  organizationName: string;
+  organizationType: string;
+  organizationAddress: string;
+  organizationPhone: string;
+  organizationEmail: string;
+  organizationWebsite: string;
+}
+
 // Extend the Request interface to include `user`
 export interface CustomRequest extends Request {
   user?: JwtPayload;
   address?: AddressType;
+  organization?: VendorOrganizationSchemaType;
 }
 
 const tokenGenerator = (payload: {}) => {

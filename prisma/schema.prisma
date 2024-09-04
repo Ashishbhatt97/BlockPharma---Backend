@@ -72,6 +72,8 @@ model VendorOrganization {
   state         String
   pincode       Int
   isActive      Boolean     @default(true)
+  phoneNumber   String
+  website       String
   userId        String
   user          User        @relation(fields: [userId], references: [id])
   VendorOwner   VendorOwner @relation(fields: [vendorOwnerId], references: [vendorId])

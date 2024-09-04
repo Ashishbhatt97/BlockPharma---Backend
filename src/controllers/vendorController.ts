@@ -3,7 +3,12 @@ import asyncHandler from "../middleware/asyncHandler";
 import sendResponse from "../helper/responseHelper";
 import { vendorServices } from "../services/services";
 import { CustomRequest } from "../middleware/jwtAuthentication";
-import { VendorOwnerSchema, VendorSchemaType } from "../models/Vendor";
+import {
+  VendorOrganizationSchema,
+  VendorOrganizationSchemaType,
+  VendorOwnerSchema,
+  VendorSchemaType,
+} from "../models/Vendor";
 
 // @desc    Add Vendor
 // @route   /api/vendor/addVendor
@@ -56,8 +61,42 @@ const deleteVendor = asyncHandler(async (req: CustomRequest, res: Response) => {
   }
 });
 
+// @desc    Add Organization
+// @route   /api/vendor/addOrganization
+// @access  POST
+const addOrganization = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+    const { id } = req.user;
+    console.log(req.body);
+
+    const validateOrganization = VendorOrganizationSchema.safeParse(req.body);
+
+    if (validateOrganization.error) {
+      return sendResponse(res, 400, {
+        message: validateOrganization.error.message,
+      });
+    }
+
+    const validatedSchema: VendorOrganizationSchemaType =
+      validateOrganization.data;
+
+    const result = await vendorServices.addOrganizationService(
+      id,
+      validatedSchema
+    );
+
+    if (result && result.status !== undefined) {
+      sendResponse(res, result.status, result);
+    }
+  }
+);
+
 export default {
   addVendor,
   deleteVendor,
   getVendor,
+  addOrganization,
 };
