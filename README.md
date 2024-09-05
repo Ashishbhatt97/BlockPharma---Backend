@@ -47,7 +47,7 @@ The BlockPharma Backend is a server-side application designed to power the Block
 4. **Rename .env.example:**
 
 - Change name `.env.example` to `.env`
-- Create Your Own `JWT_SECRET_KEY=` Key
+- Create Your Own `SECRET_KEY=` Key
 - Setup Postgres server and paste the URL in `DATABASE_URL =`
 
 5. **Running the Project**

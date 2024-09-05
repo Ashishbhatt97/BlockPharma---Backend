@@ -296,15 +296,8 @@ const deleteUser = async (userId: string) => {
     const user = await getUserById(userId);
     if (!user) return null;
 
-    const deletedUser = await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        isDeleted: true,
-      },
-    });
-
+    const deletedUser = await deleteUserAndRelatedData(userId);
+    console.log("deletedUser", deletedUser);
     if (!deletedUser) {
       return {
         status: 400,
@@ -341,6 +334,7 @@ const getUserById = async (userId: string) => {
       include: {
         Address: true,
         VendorOrganization: true,
+        PharmacyOutlet: true,
       },
     });
 
@@ -348,8 +342,6 @@ const getUserById = async (userId: string) => {
       return null;
     }
     const userData = convertBigIntToString(user);
-
-    console.log(userData);
 
     return userData;
   } catch (error: any) {
@@ -439,9 +431,78 @@ const updateAddress = async (userId: string, addressObj: AddressSchemaType) => {
   }
 };
 
+const deleteUserAndRelatedData = async (userId: string) => {
+  const deletedUser = await prisma.$transaction(async (prisma) => {
+    // Check and delete Address (has a unique constraint on userId)
+    const address = await prisma.address.findUnique({
+      where: { userId },
+    });
+    if (address) {
+      await prisma.address.delete({
+        where: { userId },
+      });
+    }
+
+    // Check and delete VendorOrganization records
+    const vendorOrganizations = await prisma.vendorOrganization.findMany({
+      where: { userId },
+    });
+    if (vendorOrganizations.length > 0) {
+      await prisma.vendorOrganization.deleteMany({
+        where: { userId },
+      });
+    }
+
+    // Check and delete PharmacyOutlet records (children of Pharmacist)
+    const pharmacyOutlets = await prisma.pharmacyOutlet.findMany({
+      where: { userId },
+    });
+    if (pharmacyOutlets.length > 0) {
+      await prisma.pharmacyOutlet.deleteMany({
+        where: { userId },
+      });
+    }
+
+    // Check and delete VendorOwner (has a unique constraint on userId)
+    const vendorOwner = await prisma.vendorOwner.findUnique({
+      where: { userId },
+    });
+    if (vendorOwner) {
+      await prisma.vendorOwner.delete({
+        where: { userId },
+      });
+    }
+
+    // Check and delete Pharmacist (has a unique constraint on userId)
+    const pharmacist = await prisma.pharmacist.findUnique({
+      where: { userId },
+    });
+    if (pharmacist) {
+      await prisma.pharmacist.delete({
+        where: { userId },
+      });
+    }
+
+    // Mark the user as deleted
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    return updatedUser;
+  });
+
+  return deletedUser;
+};
+
 export default {
   createUser,
   findUserByEmail,
+  deleteUserAndRelatedData,
   loginUser,
   updateUserDetails,
   upgradeUser,
