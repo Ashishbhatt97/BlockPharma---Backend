@@ -32,19 +32,12 @@ model User {
   VendorOrganization VendorOrganization[]
   Pharmacist         Pharmacist?
   PharmacyOutlet     PharmacyOutlet[]
-}
-
-enum Role {
-  USER
-  ADMIN
-  SUPPLIER
-  PHARMACY
+  Orders             Orders[]
 }
 
 model Address {
   id        Int      @id @default(autoincrement())
   userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
   street    String
   city      String
   state     String
@@ -52,15 +45,16 @@ model Address {
   zipCode   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model VendorOwner {
   vendorId            BigInt               @id @default(autoincrement())
   userId              String               @unique
-  VendorOrganizations VendorOrganization[]
-  user                User                 @relation(fields: [userId], references: [id])
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
+  user                User                 @relation(fields: [userId], references: [id])
+  VendorOrganizations VendorOrganization[]
 }
 
 model VendorOrganization {
@@ -77,19 +71,20 @@ model VendorOrganization {
   phoneNumber   String
   website       String?
   userId        String
-  user          User        @relation(fields: [userId], references: [id])
-  VendorOwner   VendorOwner @relation(fields: [vendorOwnerId], references: [vendorId])
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+  user          User        @relation(fields: [userId], references: [id])
+  VendorOwner   VendorOwner @relation(fields: [vendorOwnerId], references: [vendorId])
+  Orders        Orders[]
 }
 
 model Pharmacist {
   pharmacistId    BigInt           @id @default(autoincrement())
   userId          String           @unique
-  user            User             @relation(fields: [userId], references: [id])
-  pharmacyOutlets PharmacyOutlet[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id])
+  pharmacyOutlets PharmacyOutlet[]
 }
 
 model PharmacyOutlet {
@@ -105,9 +100,57 @@ model PharmacyOutlet {
   email             String     @unique
   website           String?
   userId            String
-  user              User       @relation(fields: [userId], references: [id])
-  pharmacist        Pharmacist @relation(fields: [pharmacistOwnerId], references: [pharmacistId])
   isActive          Boolean    @default(true)
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
+  user              User       @relation(fields: [userId], references: [id])
+  pharmacist        Pharmacist @relation(fields: [pharmacistOwnerId], references: [pharmacistId])
+  Orders            Orders[]
+}
+
+model Orders {
+  orderId          String             @id
+  userId           String
+  pharmacyOutletId BigInt
+  orgId            BigInt
+  orderDate        DateTime
+  orderStatus      orderStatus        @default(PENDING)
+  paymentStatus    paymentStatus      @default(PENDING)
+  paymentMethod    paymentMethod
+  amount           Float
+  currency         String
+  orderDetails     Json
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  user             User               @relation(fields: [userId], references: [id])
+  orderedBy        PharmacyOutlet     @relation(fields: [pharmacyOutletId], references: [pharmacyOutletId])
+  orderedTo        VendorOrganization @relation(fields: [orgId], references: [orgId])
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPPLIER
+  PHARMACY
+}
+
+enum orderStatus {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+  CANCELLED
+}
+
+enum paymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum paymentMethod {
+  CASH_ON_DELIVERY
+  UPI
+  CARD
+  NET_BANKING
+  CRYPTO
 }
