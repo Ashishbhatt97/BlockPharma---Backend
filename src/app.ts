@@ -1,6 +1,11 @@
 import express, { Application } from "express";
 import cors from "cors";
-import { userRoutes, vendorRoutes, pharmacistRoutes } from "./routes/routes";
+import {
+  userRoutes,
+  vendorRoutes,
+  pharmacistRoutes,
+  orderRoutes,
+} from "./routes/routes";
 import bodyParser from "body-parser";
 require("dotenv").config();
 
@@ -25,6 +30,7 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/user", userRoutes);
 app.use("/api/vendor", vendorRoutes);
 app.use("/api/pharmacist", pharmacistRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
