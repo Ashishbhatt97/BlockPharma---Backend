@@ -2,36 +2,17 @@ import { orderStatus, paymentMethod, paymentStatus } from "@prisma/client";
 import prisma from "../config/db.config";
 import { OrderSchemaType } from "../models/Orders";
 import pharmacistDataAccess from "./pharmacistDataAccess";
+import convertBigIntToString from "../helper/convertBigIntToString";
 
-const createOrder = async (validatedOrder: OrderSchemaType) => {
-  // Check for undefined or missing orderStatus
-  if (validatedOrder.orderStatus === undefined) {
-    return {
-      status: 400,
-      message: "Order status is required",
-    };
-  }
+type OrderItemSchemaType = {
+  productId: string;
+  quantity: number;
+  price: number;
+};
 
-  // Check for undefined or missing paymentStatus
-  if (validatedOrder.paymentStatus === undefined) {
-    return {
-      status: 400,
-      message: "Payment status is required",
-    };
-  }
-
-  // Check for undefined or missing paymentMethod
-  if (!validatedOrder.paymentMethod) {
-    return {
-      status: 400,
-      message: "Payment method is required",
-    };
-  }
-
+const createOrder = async (id: string, validatedOrder: OrderSchemaType) => {
   try {
-    const isPharmacist = await pharmacistDataAccess.isUserPharmacist(
-      validatedOrder.userId
-    );
+    const isPharmacist = await pharmacistDataAccess.isUserPharmacist(id);
     if (!isPharmacist) {
       return {
         status: 403,
@@ -42,14 +23,12 @@ const createOrder = async (validatedOrder: OrderSchemaType) => {
     const order = await prisma.orders.create({
       data: {
         orderId: `ORD-${
-          validatedOrder.userId.trim().substring(0, 3) +
-          Math.floor(Math.random() * 1000000)
+          id.trim().substring(0, 3) + Math.floor(Math.random() * 1000000)
         }`,
-        userId: validatedOrder.userId,
+        userId: id,
         pharmacyOutletId: validatedOrder.pharmacyOutletId,
         orgId: validatedOrder.orgId,
-        orderDate: validatedOrder.orderDate,
-        orderDetails: validatedOrder.orderDetails,
+        orderDate: new Date(),
         amount: validatedOrder.amount,
         currency: validatedOrder.currency,
         paymentMethod: validatedOrder.paymentMethod as paymentMethod,
@@ -58,17 +37,28 @@ const createOrder = async (validatedOrder: OrderSchemaType) => {
       },
     });
 
-    if (!order) {
+    console.log(order);
+
+    const orderItems = await createOrderItem(
+      order.orderId,
+      validatedOrder.orderItems
+    );
+
+    console.log(orderItems);
+
+    if (!order || !orderItems) {
       return {
         status: 400,
         message: "Order creation failed",
       };
     }
 
+    const orderData = convertBigIntToString(order);
+
     return {
       status: 201,
       message: "Order created successfully",
-      data: order,
+      data: orderData,
     };
   } catch (error: any) {
     return {
@@ -113,4 +103,76 @@ const getAllPharmacistOrders = async (userId: string) => {
     };
   }
 };
-export default { createOrder, getAllPharmacistOrders };
+
+const createOrderItem = async (
+  orderId: string,
+  orderItems: OrderItemSchemaType[]
+) => {
+  console.log(orderItems);
+  try {
+    const orderItem = await prisma.orderItems.createMany({
+      data: orderItems.map((item) => ({
+        orderId,
+        productId: BigInt(item.productId),
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    });
+
+    if (!orderItem || orderItem.count === 0) {
+      return null;
+    }
+
+    return orderItem;
+  } catch (error: any) {
+    return null;
+  }
+};
+
+const getOrderById = async (orderId: string) => {
+  try {
+    const order = await prisma.orders.findUnique({
+      where: {
+        orderId,
+      },
+    });
+
+    if (!order) {
+      return {
+        status: 404,
+        message: "Order not found",
+      };
+    }
+
+    const orderData = convertBigIntToString(order);
+
+    const orderItems = await prisma.orderItems.findMany({
+      where: {
+        orderId,
+      },
+    });
+
+    const orderItemsData = convertBigIntToString(orderItems);
+
+    return {
+      status: 200,
+      message: "Order fetched successfully",
+      data: {
+        ...orderData,
+        orderItems: orderItemsData,
+      },
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
+export default {
+  createOrder,
+  getAllPharmacistOrders,
+  createOrderItem,
+  getOrderById,
+};

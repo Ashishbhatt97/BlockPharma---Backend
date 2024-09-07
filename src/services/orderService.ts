@@ -2,8 +2,11 @@ import { OrderSchemaType } from "../models/Orders";
 
 import { orderDataAccess } from "../data access/dataAccess";
 
-const createOrderService = async (validatedOrder: OrderSchemaType) => {
-  const order = await orderDataAccess.createOrder(validatedOrder);
+const createOrderService = async (
+  id: string,
+  validatedOrder: OrderSchemaType
+) => {
+  const order = await orderDataAccess.createOrder(id, validatedOrder);
 
   if (!order || order.status !== 201) {
     return {
@@ -36,4 +39,25 @@ const getAllPharmacistOrdersService = async (userId: string) => {
   };
 };
 
-export default { createOrderService, getAllPharmacistOrdersService };
+const getOrderByIdService = async (orderId: string) => {
+  const order = await orderDataAccess.getOrderById(orderId);
+
+  if (!order || order.status !== 200) {
+    return {
+      status: order?.status,
+      message: order?.message,
+    };
+  }
+
+  return {
+    status: order.status,
+    message: order.message,
+    data: order.data,
+  };
+};
+
+export default {
+  createOrderService,
+  getAllPharmacistOrdersService,
+  getOrderByIdService,
+};

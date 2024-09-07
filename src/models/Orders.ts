@@ -17,25 +17,22 @@ const paymentStatusEnum = z.enum(["PENDING", "PAID", "FAILED"], {
   }),
 });
 
-const paymentMethodEnum = z.enum(
-  ["CREDIT_CARD", "DEBIT_CARD", "NET_BANKING", "UPI", "CASH_ON_DELIVERY"],
-  {
-    errorMap: () => ({
-      message:
-        "Invalid payment method. Must be one of CREDIT_CARD, DEBIT_CARD, NET_BANKING, UPI, or CASH_ON_DELIVERY.",
-    }),
-  }
-);
+const paymentMethodEnum = z.enum(["CARD", "NET_BANKING", "UPI", "CASH"], {
+  errorMap: () => ({
+    message:
+      "Invalid payment method. Must be one of CARD, NET_BANKING, UPI, or CASH_ON_DELIVERY.",
+  }),
+});
 
 // Zod validation schema for the order model
 export const orderValidationSchema = z.object({
-  orderId: z
-    .string()
-    .uuid({ message: "Invalid order ID. Must be a valid UUID." }),
-  userId: z.string({
-    required_error: "User ID is required.",
-    invalid_type_error: "User ID must be a string.",
-  }),
+  orderId: z.string().optional(),
+  userId: z
+    .string({
+      required_error: "User ID is required.",
+      invalid_type_error: "User ID must be a string.",
+    })
+    .optional(),
   pharmacyOutletId: z.bigint({
     required_error: "Pharmacy Outlet ID is required.",
     invalid_type_error: "Pharmacy Outlet ID must be a BigInt.",
@@ -44,10 +41,12 @@ export const orderValidationSchema = z.object({
     required_error: "Organization ID is required.",
     invalid_type_error: "Organization ID must be a BigInt.",
   }),
-  orderDate: z.date({
-    required_error: "Order date is required.",
-    invalid_type_error: "Order date must be a valid date.",
-  }),
+  orderDate: z
+    .date({
+      required_error: "Order date is required.",
+      invalid_type_error: "Order date must be a valid date.",
+    })
+    .optional(),
   orderStatus: orderStatusEnum.default("PENDING"),
   paymentStatus: paymentStatusEnum.default("PENDING"),
   paymentMethod: paymentMethodEnum,
@@ -55,9 +54,11 @@ export const orderValidationSchema = z.object({
   currency: z
     .string()
     .min(1, { message: "Currency is required and cannot be empty." }),
-  orderDetails: z.any({
-    required_error: "Order details must be a valid JSON object.",
-  }),
+  orderItems: z
+    .any({
+      required_error: "Order details must be a valid JSON object.",
+    })
+    .optional(),
   createdAt: z
     .date()
     .optional()
@@ -69,4 +70,36 @@ export const orderValidationSchema = z.object({
     .or(z.string().datetime({ message: "Invalid date format for updatedAt." })),
 });
 
+const orderItemValidationSchema = z.array(
+  z.object({
+    orderId: z.string({
+      required_error: "Order ID is required.",
+      invalid_type_error: "Order ID must be a string.",
+    }),
+    productId: z.string({
+      required_error: "Product ID is required.",
+      invalid_type_error: "Product ID must be a string.",
+    }),
+    quantity: z
+      .number()
+      .int()
+      .positive({ message: "Quantity must be a positive integer." }),
+    price: z.number().positive({ message: "Price must be a positive number." }),
+    createdAt: z
+      .date()
+      .optional()
+      .default(new Date())
+      .or(
+        z.string().datetime({ message: "Invalid date format for createdAt." })
+      ),
+    updatedAt: z
+      .date()
+      .optional()
+      .or(
+        z.string().datetime({ message: "Invalid date format for updatedAt." })
+      ),
+  })
+);
+
+export type OrderItemSchemaType = z.infer<typeof orderItemValidationSchema>;
 export type OrderSchemaType = z.infer<typeof orderValidationSchema>;
