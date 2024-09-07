@@ -101,5 +101,17 @@ const orderItemValidationSchema = z.array(
   })
 );
 
+const updateOrderValidationSchema = z.object({
+  orderId: z.string({
+    required_error: "Order ID is required.",
+    invalid_type_error: "Order ID must be a string.",
+  }),
+  orderStatus: orderStatusEnum.optional(),
+  paymentStatus: paymentStatusEnum.optional(),
+  paymentMethod: paymentMethodEnum.optional(),
+});
+
+export type UpdateOrderSchemaType = z.infer<typeof updateOrderValidationSchema>;
+
 export type OrderItemSchemaType = z.infer<typeof orderItemValidationSchema>;
 export type OrderSchemaType = z.infer<typeof orderValidationSchema>;

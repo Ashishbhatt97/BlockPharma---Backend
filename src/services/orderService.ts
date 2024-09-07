@@ -1,5 +1,4 @@
-import { OrderSchemaType } from "../models/Orders";
-
+import { OrderSchemaType, UpdateOrderSchemaType } from "../models/Orders";
 import { orderDataAccess } from "../data access/dataAccess";
 
 const createOrderService = async (
@@ -56,8 +55,47 @@ const getOrderByIdService = async (orderId: string) => {
   };
 };
 
+const updateOrderService = async (
+  orderId: string,
+  orderDetails: UpdateOrderSchemaType
+) => {
+  const updatedOrder = await orderDataAccess.updateOrder(orderId, orderDetails);
+
+  if (!updatedOrder || updatedOrder.status !== 200) {
+    return {
+      status: updatedOrder?.status,
+      message: updatedOrder?.message,
+    };
+  }
+
+  return {
+    status: updatedOrder.status,
+    message: updatedOrder.message,
+    data: updatedOrder.data,
+  };
+};
+
+const cancelOrderService = async (orderId: string, userId: string) => {
+  const cancelledOrder = await orderDataAccess.cancelOrder(orderId, userId);
+
+  if (!cancelledOrder || cancelledOrder.status !== 200) {
+    return {
+      status: cancelledOrder?.status,
+      message: cancelledOrder?.message,
+    };
+  }
+
+  return {
+    status: cancelledOrder.status,
+    message: cancelledOrder.message,
+    data: cancelledOrder.data,
+  };
+};
+
 export default {
   createOrderService,
   getAllPharmacistOrdersService,
   getOrderByIdService,
+  updateOrderService,
+  cancelOrderService,
 };

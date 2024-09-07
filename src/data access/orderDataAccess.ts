@@ -1,15 +1,15 @@
-import { orderStatus, paymentMethod, paymentStatus } from "@prisma/client";
 import prisma from "../config/db.config";
-import { OrderSchemaType } from "../models/Orders";
 import pharmacistDataAccess from "./pharmacistDataAccess";
 import convertBigIntToString from "../helper/convertBigIntToString";
+import { OrderSchemaType, UpdateOrderSchemaType } from "../models/Orders";
+import { orderStatus, paymentMethod, paymentStatus } from "@prisma/client";
 
 type OrderItemSchemaType = {
   productId: string;
   quantity: number;
   price: number;
 };
-
+//create order
 const createOrder = async (id: string, validatedOrder: OrderSchemaType) => {
   try {
     const isPharmacist = await pharmacistDataAccess.isUserPharmacist(id);
@@ -68,6 +68,7 @@ const createOrder = async (id: string, validatedOrder: OrderSchemaType) => {
   }
 };
 
+//get all orders for a pharmacist
 const getAllPharmacistOrders = async (userId: string) => {
   try {
     const isPharmacist = await pharmacistDataAccess.isUserPharmacist(userId);
@@ -104,6 +105,7 @@ const getAllPharmacistOrders = async (userId: string) => {
   }
 };
 
+//create order item
 const createOrderItem = async (
   orderId: string,
   orderItems: OrderItemSchemaType[]
@@ -129,6 +131,7 @@ const createOrderItem = async (
   }
 };
 
+//get order by id
 const getOrderById = async (orderId: string) => {
   try {
     const order = await prisma.orders.findUnique({
@@ -170,9 +173,89 @@ const getOrderById = async (orderId: string) => {
   }
 };
 
+//update order
+const updateOrder = async (orderId: string, order: UpdateOrderSchemaType) => {
+  try {
+    const updatedOrder = await prisma.orders.update({
+      where: {
+        orderId,
+      },
+      data: {
+        orderStatus: order.orderStatus as orderStatus,
+        paymentStatus: order.paymentStatus as paymentStatus,
+      },
+    });
+
+    if (!updatedOrder) {
+      return {
+        status: 404,
+        message: "Order not found",
+      };
+    }
+
+    const updatedOrderData = convertBigIntToString(updatedOrder);
+    return {
+      status: 200,
+      message: "Order updated successfully",
+      data: updatedOrderData,
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
+//cancel order
+const cancelOrder = async (orderId: string, userId: string) => {
+  try {
+    const isPharmacist = await pharmacistDataAccess.isUserPharmacist(userId);
+
+    if (!isPharmacist) {
+      return {
+        status: 403,
+        message: "User is not a pharmacist",
+      };
+    }
+
+    const cancelledOrder = await prisma.orders.update({
+      where: {
+        orderId,
+      },
+      data: {
+        orderStatus: "CANCELLED" as orderStatus,
+        paymentStatus: "FAILED" as paymentStatus,
+      },
+    });
+
+    if (!cancelledOrder) {
+      return {
+        status: 404,
+        message: "Order not found",
+      };
+    }
+
+    const cancelledOrderData = convertBigIntToString(cancelledOrder);
+
+    return {
+      status: 200,
+      message: "Order cancelled successfully",
+      data: cancelledOrderData,
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
 export default {
   createOrder,
   getAllPharmacistOrders,
   createOrderItem,
   getOrderById,
+  updateOrder,
+  cancelOrder,
 };

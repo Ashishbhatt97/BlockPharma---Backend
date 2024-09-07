@@ -87,8 +87,50 @@ const getOrderById = asyncHandler(async (req: CustomRequest, res: Response) => {
   }
 });
 
+// @desc    Update Order
+// @route   /api/orders/updateOrder
+// @access  PUT
+const updateOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, {
+      status: false,
+      message: "Unauthorized",
+    });
+  }
+
+  const { orderId } = req.body;
+  const orderDetails = req.body;
+
+  const result = await orderServices.updateOrderService(orderId, orderDetails);
+  if (result.status !== undefined) {
+    sendResponse(res, result.status, result);
+  }
+});
+
+// @desc    Cancel Order
+// @route   /api/orders/cancelOrder
+// @access  PUT
+const cancelOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, {
+      status: false,
+      message: "Unauthorized",
+    });
+  }
+
+  const { id } = req.user;
+  const { orderId } = req.body;
+
+  const result = await orderServices.cancelOrderService(orderId, id);
+  if (result.status !== undefined) {
+    sendResponse(res, result.status, result);
+  }
+});
+
 export default {
   createOrder,
   getOrders,
   getOrderById,
+  updateOrder,
+  cancelOrder,
 };
