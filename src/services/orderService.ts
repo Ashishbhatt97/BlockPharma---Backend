@@ -1,15 +1,39 @@
 import { OrderSchemaType } from "../models/Orders";
 
-const orderDataAccess = require("../dataAccess/orderDataAccess");
+import { orderDataAccess } from "../data access/dataAccess";
 
 const createOrderService = async (validatedOrder: OrderSchemaType) => {
-  const order = orderDataAccess.createOrder(validatedOrder);
+  const order = await orderDataAccess.createOrder(validatedOrder);
+
+  if (!order || order.status !== 201) {
+    return {
+      status: order.status,
+      message: order.message,
+    };
+  }
 
   return {
-    status: 201,
-    message: "Order created successfully",
-    data: order,
+    status: order.status,
+    message: order.message,
+    data: order.data,
   };
 };
 
-export default { createOrderService };
+const getAllPharmacistOrdersService = async (userId: string) => {
+  const orders = await orderDataAccess.getAllPharmacistOrders(userId);
+
+  if (!orders || orders.status !== 200) {
+    return {
+      status: orders.status,
+      message: orders.message,
+    };
+  }
+
+  return {
+    status: orders.status,
+    message: orders.message,
+    data: orders.data,
+  };
+};
+
+export default { createOrderService, getAllPharmacistOrdersService };
