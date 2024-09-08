@@ -127,10 +127,31 @@ const cancelOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
   }
 });
 
+// @desc    Get All User Orders
+// @route   /api/orders/getAllUserOrders
+// @access  GET
+const getAllUserOrders = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, {
+        status: false,
+        message: "Unauthorized",
+      });
+    }
+    const { id } = req.user;
+
+    const result = await orderServices.getAllUserOrdersService(id);
+    if (result.status !== undefined) {
+      sendResponse(res, result.status, result);
+    }
+  }
+);
+
 export default {
   createOrder,
   getOrders,
   getOrderById,
   updateOrder,
   cancelOrder,
+  getAllUserOrders,
 };
