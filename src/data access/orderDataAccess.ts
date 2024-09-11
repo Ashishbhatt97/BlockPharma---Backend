@@ -9,6 +9,7 @@ type OrderItemSchemaType = {
   quantity: number;
   price: number;
 };
+
 //create order
 const createOrder = async (id: string, validatedOrder: OrderSchemaType) => {
   try {
@@ -37,14 +38,10 @@ const createOrder = async (id: string, validatedOrder: OrderSchemaType) => {
       },
     });
 
-    console.log(order);
-
     const orderItems = await createOrderItem(
       order.orderId,
       validatedOrder.orderItems
     );
-
-    console.log(orderItems);
 
     if (!order || !orderItems) {
       return {
@@ -110,7 +107,6 @@ const createOrderItem = async (
   orderId: string,
   orderItems: OrderItemSchemaType[]
 ) => {
-  console.log(orderItems);
   try {
     const orderItem = await prisma.orderItems.createMany({
       data: orderItems.map((item) => ({
@@ -251,6 +247,39 @@ const cancelOrder = async (orderId: string, userId: string) => {
   }
 };
 
+//get all orders for a user
+const getAllUserOrders = async (userId: string) => {
+  try {
+    const orders = await prisma.orders.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        OrderItems: true,
+      },
+    });
+
+    const ordersData = convertBigIntToString(orders);
+
+    if (!orders) {
+      return {
+        status: 404,
+        message: "Orders not found",
+      };
+    }
+    return {
+      status: 200,
+      message: "Orders fetched successfully",
+      data: ordersData,
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
 export default {
   createOrder,
   getAllPharmacistOrders,
@@ -258,4 +287,5 @@ export default {
   getOrderById,
   updateOrder,
   cancelOrder,
+  getAllUserOrders,
 };

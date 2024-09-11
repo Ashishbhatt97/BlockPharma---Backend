@@ -92,10 +92,28 @@ const cancelOrderService = async (orderId: string, userId: string) => {
   };
 };
 
+const getAllUserOrdersService = async (userId: string) => {
+  const orders = await orderDataAccess.getAllUserOrders(userId);
+
+  if (!orders || orders.status !== 200) {
+    return {
+      status: orders.status,
+      message: orders.message,
+    };
+  }
+
+  return {
+    status: orders.status,
+    message: orders.message,
+    data: orders.data,
+  };
+};
+
 export default {
   createOrderService,
   getAllPharmacistOrdersService,
   getOrderByIdService,
   updateOrderService,
   cancelOrderService,
+  getAllUserOrdersService,
 };
