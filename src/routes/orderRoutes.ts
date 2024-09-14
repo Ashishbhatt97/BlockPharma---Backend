@@ -12,5 +12,6 @@ router.route("/cancelOrder").put(jwtAuth, orderController.cancelOrder);
 router
   .route("/getAllUserOrders")
   .get(jwtAuth, orderController.getAllUserOrders);
+router.route("/delete").delete(jwtAuth, orderController.deleteOrder);
 
 export default router;

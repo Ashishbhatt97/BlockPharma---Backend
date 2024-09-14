@@ -106,7 +106,7 @@ const updateOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
     sendResponse(res, result.status, result);
   }
 });
-
+``
 // @desc    Cancel Order
 // @route   /api/orders/cancelOrder
 // @access  PUT
@@ -147,6 +147,26 @@ const getAllUserOrders = asyncHandler(
   }
 );
 
+// @desc    Delete Order
+// @route   /api/orders/deleteOrder
+// @access  DELETE
+const deleteOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, {
+      status: false,
+      message: "Unauthorized",
+    });
+  }
+
+  const { id } = req.user;
+  const { orderId } = req.body;
+
+  const result = await orderServices.deleteOrderService(orderId, id);
+  if (result.status !== undefined) {
+    sendResponse(res, result.status, result);
+  }
+});
+
 export default {
   createOrder,
   getOrders,
@@ -154,4 +174,5 @@ export default {
   updateOrder,
   cancelOrder,
   getAllUserOrders,
+  deleteOrder,
 };
