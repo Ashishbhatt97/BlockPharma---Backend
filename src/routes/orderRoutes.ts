@@ -1,6 +1,6 @@
 import express, { Router } from "express";
-import { jwtAuth } from "../middleware/jwtAuthentication";
 import orderController from "../controllers/controllers";
+import { jwtAuth } from "../middleware/jwtAuthentication";
 
 const router: Router = express.Router();
 
@@ -12,6 +12,5 @@ router.route("/cancelOrder").put(jwtAuth, orderController.cancelOrder);
 router
   .route("/getAllUserOrders")
   .get(jwtAuth, orderController.getAllUserOrders);
-// router.route("/deleteOrder").post(jwtAuth, orderController.deleteOrder);
 
 export default router;
