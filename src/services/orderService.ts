@@ -109,6 +109,23 @@ const getAllUserOrdersService = async (userId: string) => {
   };
 };
 
+const deleteOrderService = async (orderId: string, userId: string) => {
+  const deletedOrder = await orderDataAccess.deleteOrder(orderId, userId);
+
+  if (!deletedOrder || deletedOrder.status !== 200) {
+    return {
+      status: deletedOrder?.status,
+      message: deletedOrder?.message,
+    };
+  }
+
+  return {
+    status: deletedOrder.status,
+    message: deletedOrder.message,
+    data: deletedOrder.data,
+  };
+};
+
 export default {
   createOrderService,
   getAllPharmacistOrdersService,
@@ -116,4 +133,5 @@ export default {
   updateOrderService,
   cancelOrderService,
   getAllUserOrdersService,
+  deleteOrderService,
 };

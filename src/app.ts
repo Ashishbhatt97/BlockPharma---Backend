@@ -1,5 +1,7 @@
 import express, { Application } from "express";
 import cors from "cors";
+import morgan from "morgan";
+
 import {
   userRoutes,
   vendorRoutes,
@@ -19,6 +21,8 @@ app.use(
     extended: false,
   })
 );
+
+app.use(morgan("dev"));
 
 // Enable CORS
 app.use(cors());

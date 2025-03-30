@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "build": "tsc -w",
-    "start": "nodemon ./dist/app.js",
-    "dev": "concurrently -k \"npm run build\" \"npm run start\""
+    "dev": "nodemon",
+    "start": "ts-node ./src/app.ts"
   },
   "keywords": [],
   "author": "",
@@ -26,14 +25,16 @@
     "express": "^4.19.2",
     "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "nodemon": "^3.1.4",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@prisma/client": "^5.19.1",
+    "@types/morgan": "^1.9.9",
     "@types/node": "^22.5.1",
     "i": "^0.3.7",
+    "nodemon": "^3.1.9",
     "npm": "^10.8.3",
     "prisma": "^5.19.1",
     "ts-node": "^10.9.2",

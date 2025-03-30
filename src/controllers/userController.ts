@@ -227,6 +227,22 @@ const updateAddress = asyncHandler(
   }
 );
 
+// @desc    Me Query
+// @route   /api/user/me
+// @access  GET
+const meQuery = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, { message: "Unauthorized" });
+  }
+
+  const { id } = req.user;
+  const result = await userServices.meService(id);
+
+  if (result?.status !== undefined) {
+    sendResponse(res, result.status, result);
+  }
+});
+
 export default {
   userRegister,
   userLogin,
@@ -237,4 +253,5 @@ export default {
   getUserById,
   addAddress,
   updateAddress,
+  meQuery,
 };

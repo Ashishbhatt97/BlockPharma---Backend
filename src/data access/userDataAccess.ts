@@ -35,9 +35,6 @@ const createUser = async (userObj: RegisterSchemaType) => {
         email: userObj.email,
         password: hashedPassword,
         profilePic: userObj.profilePic || null,
-        oAuthId: userObj.oAuthId || null,
-        provider: userObj.provider || null,
-        phoneNumber: userObj.phoneNumber,
         isDeleted: false,
       },
     });
@@ -395,6 +392,19 @@ const updateAddress = async (userId: string, addressObj: AddressSchemaType) => {
   try {
     const user = await getUserById(userId);
     if (!user) return null;
+
+    const addressExists = await prisma.address.findUnique({
+      where: {
+        userId: userId,
+      },
+    });
+
+    if (!addressExists) {
+      return {
+        status: 404,
+        message: "Address not found",
+      };
+    }
 
     const updatedAddress = await prisma.address.update({
       where: {

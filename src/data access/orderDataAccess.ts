@@ -280,6 +280,44 @@ const getAllUserOrders = async (userId: string) => {
   }
 };
 
+//delete Order
+const deleteOrder = async (orderId: string, userId: string) => {
+  try {
+    const isPharmacist = await pharmacistDataAccess.isUserPharmacist(userId);
+    if (!isPharmacist) {
+      return {
+        status: 403,
+        message: "User is not a pharmacist",
+      };
+    }
+
+    const deletedOrder = await prisma.orders.delete({
+      where: {
+        orderId,
+        userId,
+      },
+    });
+
+    if (!deletedOrder) {
+      return {
+        status: 404,
+        message: "Order not found",
+      };
+    }
+
+    return {
+      status: 200,
+      message: "Order deleted successfully",
+      data: deletedOrder,
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      message: error.message,
+    };
+  }
+};
+
 export default {
   createOrder,
   getAllPharmacistOrders,
@@ -288,4 +326,5 @@ export default {
   updateOrder,
   cancelOrder,
   getAllUserOrders,
+  deleteOrder,
 };

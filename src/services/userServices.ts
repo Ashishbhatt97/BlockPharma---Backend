@@ -285,6 +285,24 @@ const updateAddressService = async (
   }
 };
 
+//Get User By Id Service
+const meService = async (userId: string) => {
+  const res = await userDataAccess.getUserById(userId);
+  if (!res) {
+    return {
+      status: 400,
+      error: "Error getting user",
+    };
+  }
+  if (res) {
+    return {
+      status: 200,
+      message: "User fetched successfully",
+      data: res,
+    };
+  }
+};
+
 export default {
   userRegisterService,
   userLoginService,
@@ -295,4 +313,5 @@ export default {
   getUserByIdService,
   addAddressService,
   updateAddressService,
+  meService,
 };

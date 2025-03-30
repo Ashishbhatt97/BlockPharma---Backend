@@ -16,7 +16,8 @@ export const signupSchema = z.object({
   phoneNumber: z
     .string()
     .length(10, "Phone number must be exactly 10 digits")
-    .regex(/^\d+$/, "Phone number must contain only digits"),
+    .regex(/^\d+$/, "Phone number must contain only digits")
+    .optional(),
   isDeleted: z.boolean().optional(),
 });
 

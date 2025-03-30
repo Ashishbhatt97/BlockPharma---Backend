@@ -7,7 +7,7 @@ import { orderServices } from "../services/services";
 
 // @desc    Create Order
 // @route   POST /api/orders/createOrder
-// @MET  POST
+// @access  POST
 const createOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
   if (!req.user) {
     return sendResponse(res, 401, {
@@ -17,6 +17,7 @@ const createOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
   }
 
   const { id } = req.user;
+
   const orderSchema = {
     pharmacyOutletId: BigInt(req.body.pharmacyOutletId),
     orgId: BigInt(req.body.orgId),
@@ -147,6 +148,26 @@ const getAllUserOrders = asyncHandler(
   }
 );
 
+// @desc    Delete Order
+// @route   /api/orders/deleteOrder
+// @access  DELETE
+const deleteOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, {
+      status: false,
+      message: "Unauthorized",
+    });
+  }
+
+  const { id } = req.user;
+  const { orderId } = req.body;
+
+  const result = await orderServices.deleteOrderService(orderId, id);
+  if (result.status !== undefined) {
+    sendResponse(res, result.status, result);
+  }
+});
+
 export default {
   createOrder,
   getOrders,
@@ -154,4 +175,5 @@ export default {
   updateOrder,
   cancelOrder,
   getAllUserOrders,
+  deleteOrder,
 };
