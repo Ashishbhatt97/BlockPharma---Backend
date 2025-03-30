@@ -41,7 +41,6 @@ const tokenGenerator = (payload: {}) => {
     expiresIn: "30d",
   });
 
-  result = "Bearer " + result;
   return result;
 };
 

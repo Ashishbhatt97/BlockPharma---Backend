@@ -35,9 +35,6 @@ const createUser = async (userObj: RegisterSchemaType) => {
         email: userObj.email,
         password: hashedPassword,
         profilePic: userObj.profilePic || null,
-        oAuthId: userObj.oAuthId || null,
-        provider: userObj.provider || null,
-        phoneNumber: userObj.phoneNumber,
         isDeleted: false,
       },
     });

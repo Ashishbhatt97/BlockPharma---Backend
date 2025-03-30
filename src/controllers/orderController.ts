@@ -7,7 +7,7 @@ import { orderServices } from "../services/services";
 
 // @desc    Create Order
 // @route   POST /api/orders/createOrder
-// @MET  POST
+// @access  POST
 const createOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
   if (!req.user) {
     return sendResponse(res, 401, {
@@ -17,6 +17,7 @@ const createOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
   }
 
   const { id } = req.user;
+
   const orderSchema = {
     pharmacyOutletId: BigInt(req.body.pharmacyOutletId),
     orgId: BigInt(req.body.orgId),
@@ -106,7 +107,7 @@ const updateOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
     sendResponse(res, result.status, result);
   }
 });
-``
+
 // @desc    Cancel Order
 // @route   /api/orders/cancelOrder
 // @access  PUT
