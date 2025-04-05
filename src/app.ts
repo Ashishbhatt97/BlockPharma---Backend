@@ -29,7 +29,7 @@ app.use(morgan("dev"));
 app.use(cors());
 
 // Static file serving (e.g., profile pictures)
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/api/user", userRoutes);

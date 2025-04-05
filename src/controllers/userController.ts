@@ -262,6 +262,8 @@ const completeProfile = asyncHandler(
       profilePic,
     };
 
+    console.log(profileData);
+
     const parseResult = completeProfileSchema.safeParse(profileData);
 
     if (!parseResult.success) {

@@ -560,7 +560,7 @@ const completeProfile = async (
     return {
       status: 200,
       message: "User updated successfully",
-      data: { rest },
+      data: rest,
     };
   } catch (error: any) {
     return {
