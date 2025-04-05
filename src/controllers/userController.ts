@@ -4,6 +4,8 @@ import asyncHandler from "../middleware/asyncHandler";
 import { CustomRequest } from "../middleware/jwtAuthentication";
 import AddressSchema, { AddressSchemaType } from "../models/Address";
 import {
+  completeProfileSchema,
+  completeProfileSchemaType,
   loginSchema,
   loginSchemaType,
   RegisterSchemaType,
@@ -222,7 +224,7 @@ const updateAddress = asyncHandler(
     const validatedData: AddressSchemaType = parseResult.data;
 
     const result = await userServices.updateAddressService(id, validatedData);
-
+    console.log(result);
     sendResponse(res, result!.status, result);
   }
 );
@@ -243,6 +245,31 @@ const meQuery = asyncHandler(async (req: CustomRequest, res: Response) => {
   }
 });
 
+// @desc    Complete Profile
+// @route   /api/user/complete-profile
+// @access  POST
+const completeProfile = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { message: "Unauthorized" });
+    }
+    const { id } = req.user;
+    const parseResult = completeProfileSchema.safeParse(req.body);
+
+    if (!parseResult.success) {
+      return sendResponse(res, 400, {
+        message: parseResult.error.issues[0].message,
+      });
+    }
+
+    const validatedData: completeProfileSchemaType = parseResult.data;
+    console.log(validatedData);
+    const result = await userServices.completeProfileService(id, validatedData);
+    console.log(result);
+    sendResponse(res, result!.status, result);
+  }
+);
+
 export default {
   userRegister,
   userLogin,
@@ -254,4 +281,5 @@ export default {
   addAddress,
   updateAddress,
   meQuery,
+  completeProfile,
 };

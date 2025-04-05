@@ -3,6 +3,7 @@ import prisma from "../config/db.config";
 import { tokenGenerator } from "../middleware/middlewares";
 import {
   RegisterSchemaType,
+  completeProfileSchemaType,
   loginSchemaType,
   updateUserSchemaType,
 } from "../models/Users";
@@ -36,6 +37,7 @@ const createUser = async (userObj: RegisterSchemaType) => {
         password: hashedPassword,
         profilePic: userObj.profilePic || null,
         isDeleted: false,
+        isProfileCompleted: false,
       },
     });
 
@@ -112,15 +114,14 @@ const loginUser = async (userObj: loginSchemaType) => {
 
       const token = tokenGenerator(payload);
 
+      const { password, ...rest } = user;
+
       return {
         status: 200,
         data: {
           status: true,
           message: "Login successful",
-          user: {
-            id: user.id,
-            email: user.email,
-          },
+          user: rest,
           token: token,
         },
       };
@@ -509,6 +510,67 @@ const deleteUserAndRelatedData = async (userId: string) => {
   return deletedUser;
 };
 
+const completeProfile = async (
+  userId: string,
+  userObj: completeProfileSchemaType
+) => {
+  try {
+    const user = await getUserById(userId);
+    if (!user) return null;
+
+    if (user.isProfileCompleted) {
+      return {
+        status: 400,
+        message: "Profile already completed",
+        data: null,
+      };
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        profilePic: userObj.profilePic,
+        role: userObj.role,
+        phoneNumber: userObj.phoneNumber,
+        isProfileCompleted: true,
+        Address: {
+          create: {
+            street: userObj.street,
+            city: userObj.city,
+            state: userObj.state,
+            country: userObj.country,
+            zipCode: userObj.zipCode,
+          },
+        },
+      },
+      include: {
+        Address: true,
+      },
+    });
+
+    if (!updatedUser) {
+      return {
+        status: 400,
+        message: "Failed to update user",
+      };
+    }
+    const { password, ...rest } = updatedUser;
+
+    return {
+      status: 200,
+      message: "User updated successfully",
+      data: { rest },
+    };
+  } catch (error: any) {
+    return {
+      status: 500,
+      error: error.message,
+    };
+  }
+};
+
 export default {
   createUser,
   findUserByEmail,
@@ -522,4 +584,5 @@ export default {
   isUserDeleted,
   addAddress,
   updateAddress,
+  completeProfile,
 };

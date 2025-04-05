@@ -1,6 +1,7 @@
 import { error } from "console";
 import { userDataAccess } from "../data access/dataAccess";
 import {
+  completeProfileSchemaType,
   loginSchemaType,
   RegisterSchemaType,
   updateUserSchemaType,
@@ -38,7 +39,6 @@ const userLoginService = async (userObj: loginSchemaType) => {
 
     if (!res) return { error: "Invalid Credentials", status: 400 };
 
-    // Ensure `res` is defined and contains a `status` property
     if (res) {
       if (res.status === 200) {
         return {
@@ -59,7 +59,6 @@ const userLoginService = async (userObj: loginSchemaType) => {
           },
         };
       } else {
-        // Handle other status codes if necessary
         return {
           status: res.status,
           message: res.data?.message || "An error occurred",
@@ -268,6 +267,8 @@ const updateAddressService = async (
   userId: string,
   addressObj: AddressSchemaType
 ) => {
+  console.log("addressObj", addressObj);
+
   const res = await userDataAccess.updateAddress(userId, addressObj);
   if (!res) {
     return {
@@ -303,6 +304,42 @@ const meService = async (userId: string) => {
   }
 };
 
+const completeProfileService = async (
+  userId: string,
+  profileData: completeProfileSchemaType
+) => {
+  try {
+    const res = await userDataAccess.completeProfile(userId, profileData);
+    if (!res) {
+      return {
+        status: 400,
+        error: "Error completing profile",
+      };
+    }
+
+    if (res.status === 400) {
+      return {
+        status: 400,
+        message: res?.message,
+        data: null,
+      };
+    }
+
+    if (res.status === 200) {
+      return {
+        status: 200,
+        message: "Profile completed successfully",
+        data: res.data,
+      };
+    }
+  } catch (error) {
+    return {
+      status: 400,
+      error: "Error completing profile",
+    };
+  }
+};
+
 export default {
   userRegisterService,
   userLoginService,
@@ -314,4 +351,5 @@ export default {
   addAddressService,
   updateAddressService,
   meService,
+  completeProfileService,
 };
