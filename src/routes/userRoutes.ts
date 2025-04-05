@@ -20,7 +20,12 @@ router.route("/upgrade-user").put(jwtAuth, userController.upgradeUser);
 router.route("/change-password").put(jwtAuth, userController.changePassword);
 router.delete("/delete", jwtAuth, userController.deleteUser);
 router.get("/get-details", jwtAuth, userController.getUserById);
-router.put("/complete-profile", jwtAuth, userController.completeProfile);
+router.put(
+  "/complete-profile",
+  jwtAuth,
+  upload.single("profilePic"),
+  userController.completeProfile
+);
 // router.get("/getUser/:id", jwtAuth, userController.getUser);
 //Address Routes
 router.post("/add-address", jwtAuth, userController.addAddress);

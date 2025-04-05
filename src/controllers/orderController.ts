@@ -34,7 +34,6 @@ const createOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
   const validate = orderValidationSchema.safeParse(orderSchema);
 
   if (!validate.success) {
-    console.log(validate.error.errors[0]);
     return sendResponse(res, 400, {
       status: false,
       message: validate.error.errors[0].message,

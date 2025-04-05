@@ -38,7 +38,7 @@ export const completeProfileSchema = z.object({
     .string()
     .min(1, "Zip code is required")
     .max(10, "Zip code cannot exceed 10 characters"),
-  isProfileCompleted: z.boolean(),
+  isProfileCompleted: z.boolean().optional(),
 });
 
 // Login Schema

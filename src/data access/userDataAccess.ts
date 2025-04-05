@@ -295,7 +295,6 @@ const deleteUser = async (userId: string) => {
     if (!user) return null;
 
     const deletedUser = await deleteUserAndRelatedData(userId);
-    console.log("deletedUser", deletedUser);
     if (!deletedUser) {
       return {
         status: 400,

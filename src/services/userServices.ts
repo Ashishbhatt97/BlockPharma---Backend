@@ -267,8 +267,6 @@ const updateAddressService = async (
   userId: string,
   addressObj: AddressSchemaType
 ) => {
-  console.log("addressObj", addressObj);
-
   const res = await userDataAccess.updateAddress(userId, addressObj);
   if (!res) {
     return {

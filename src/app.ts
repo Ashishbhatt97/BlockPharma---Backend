@@ -9,6 +9,7 @@ import {
   orderRoutes,
 } from "./routes/routes";
 import bodyParser from "body-parser";
+import path from "path";
 require("dotenv").config();
 
 //initiate the server
@@ -28,7 +29,7 @@ app.use(morgan("dev"));
 app.use(cors());
 
 // Static file serving (e.g., profile pictures)
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Routes
 app.use("/api/user", userRoutes);

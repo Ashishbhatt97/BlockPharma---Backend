@@ -196,8 +196,6 @@ const addAddress = asyncHandler(async (req: CustomRequest, res: Response) => {
   }
 
   const validatedData: AddressSchemaType = parseResult.data;
-  console.log(validatedData);
-
   const result = await userServices.addAddressService(id, validatedData);
 
   sendResponse(res, result!.status, result);
@@ -224,7 +222,6 @@ const updateAddress = asyncHandler(
     const validatedData: AddressSchemaType = parseResult.data;
 
     const result = await userServices.updateAddressService(id, validatedData);
-    console.log(result);
     sendResponse(res, result!.status, result);
   }
 );
@@ -254,7 +251,18 @@ const completeProfile = asyncHandler(
       return sendResponse(res, 401, { message: "Unauthorized" });
     }
     const { id } = req.user;
-    const parseResult = completeProfileSchema.safeParse(req.body);
+
+    let profilePic = "";
+    if (req.file) {
+      profilePic = `/uploads/profilePics/${req.file.filename}`;
+    }
+
+    const profileData = {
+      ...req.body,
+      profilePic,
+    };
+
+    const parseResult = completeProfileSchema.safeParse(profileData);
 
     if (!parseResult.success) {
       return sendResponse(res, 400, {
@@ -263,9 +271,7 @@ const completeProfile = asyncHandler(
     }
 
     const validatedData: completeProfileSchemaType = parseResult.data;
-    console.log(validatedData);
     const result = await userServices.completeProfileService(id, validatedData);
-    console.log(result);
     sendResponse(res, result!.status, result);
   }
 );
