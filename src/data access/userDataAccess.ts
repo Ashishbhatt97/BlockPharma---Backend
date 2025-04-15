@@ -38,26 +38,16 @@ const createUser = async (userObj: RegisterSchemaType) => {
         profilePic: userObj.profilePic || null,
         isDeleted: false,
         isProfileCompleted: false,
+        role: userObj.role || "USER",
+        phoneNumber: userObj.phoneNumber || null,
       },
     });
 
     if (!res) {
-      return {
-        status: 400,
-        data: {
-          status: false,
-          message: "Failed to create user",
-        },
-      };
+      return null;
     }
-
-    return {
-      status: 201,
-      data: {
-        status: true,
-        message: "User created successfully",
-      },
-    };
+    const { password, ...rest } = res;
+    return rest;
   } catch (error: any) {
     return {
       status: 500,
@@ -517,14 +507,6 @@ const completeProfile = async (
     const user = await getUserById(userId);
     if (!user) return null;
 
-    if (user.isProfileCompleted) {
-      return {
-        status: 400,
-        message: "Profile already completed",
-        data: null,
-      };
-    }
-
     const updatedUser = await prisma.user.update({
       where: {
         id: userId,
@@ -570,6 +552,24 @@ const completeProfile = async (
   }
 };
 
+const getAllUsers = async () => {
+  const users = await prisma.user.findMany({
+    orderBy: {
+      firstName: "asc",
+    },
+    where: {
+      isDeleted: false,
+    },
+  });
+
+  if (users)
+    return {
+      status: 200,
+      message: "User fetched successfully",
+      data: users || [],
+    };
+};
+
 export default {
   createUser,
   findUserByEmail,
@@ -584,4 +584,5 @@ export default {
   addAddress,
   updateAddress,
   completeProfile,
+  getAllUsers,
 };

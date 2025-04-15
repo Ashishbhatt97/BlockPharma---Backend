@@ -14,6 +14,7 @@ import {
   updateUserSchemaType,
 } from "../models/Users";
 import { userServices } from "../services/services";
+import userDataAccess from "../data access/userDataAccess";
 
 // @desc    User Registration
 // @route   /api/user/register
@@ -152,7 +153,7 @@ const deleteUser = asyncHandler(async (req: CustomRequest, res: Response) => {
     return sendResponse(res, 401, { message: "Unauthorized" });
   }
 
-  const { id } = req.user;
+  const { id } = req.body;
 
   const result = await userServices.deleteUserService(id);
 
@@ -250,7 +251,7 @@ const completeProfile = asyncHandler(
     if (!req.user) {
       return sendResponse(res, 401, { message: "Unauthorized" });
     }
-    const { id } = req.user;
+    const { userId } = req.body;
 
     let profilePic = "";
     if (req.file) {
@@ -260,9 +261,8 @@ const completeProfile = asyncHandler(
     const profileData = {
       ...req.body,
       profilePic,
+      userId,
     };
-
-    console.log(profileData);
 
     const parseResult = completeProfileSchema.safeParse(profileData);
 
@@ -273,10 +273,22 @@ const completeProfile = asyncHandler(
     }
 
     const validatedData: completeProfileSchemaType = parseResult.data;
-    const result = await userServices.completeProfileService(id, validatedData);
+    const result = await userServices.completeProfileService(
+      userId,
+      validatedData
+    );
     sendResponse(res, result!.status, result);
   }
 );
+
+const getAllUsers = asyncHandler(async (req: CustomRequest, res: Response) => {
+  if (!req.user) {
+    return sendResponse(res, 401, { message: "Unauthorized" });
+  }
+
+  const result = await userDataAccess.getAllUsers();
+  sendResponse(res, 200, result);
+});
 
 export default {
   userRegister,
@@ -290,4 +302,5 @@ export default {
   updateAddress,
   meQuery,
   completeProfile,
+  getAllUsers,
 };

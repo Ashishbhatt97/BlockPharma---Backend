@@ -30,5 +30,6 @@ router.put(
 //Address Routes
 router.post("/add-address", jwtAuth, userController.addAddress);
 router.put("/update-address", jwtAuth, userController.updateAddress);
+router.get("/getAll", jwtAuth, userController.getAllUsers);
 
 export default router;

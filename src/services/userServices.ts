@@ -13,17 +13,15 @@ const userRegisterService = async (userObj: RegisterSchemaType) => {
   try {
     const res = await userDataAccess.createUser(userObj);
 
-    if (res.status === 201) {
+    if (res) {
       return {
-        status: res?.status,
-        message: res?.data.message,
+        status: 201,
+        data: res,
+        message: "User created successfully",
       };
     }
 
-    return {
-      status: res?.status,
-      message: res.data.message,
-    };
+    return res;
   } catch (error) {
     return {
       status: 400,
