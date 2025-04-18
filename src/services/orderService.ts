@@ -1,137 +1,133 @@
-import { OrderSchemaType, UpdateOrderSchemaType } from "../models/Orders";
-import { orderDataAccess } from "../data access/dataAccess";
+// import { OrderSchemaType, UpdateOrderSchemaType } from "../models/Orders";
+// // import { orderDataAccess } from "../data access/dataAccess";
 
-const createOrderService = async (
-  id: string,
-  validatedOrder: OrderSchemaType
-) => {
-  const order = await orderDataAccess.createOrder(id, validatedOrder);
+// const createOrderService = async (
+//   id: string,
+//   validatedOrder: OrderSchemaType
+// ) => {
+//   // const order = await orderDataAccess.createOrder(id, validatedOrder);
+//   // if (!order || order.status !== 201) {
+//   //   return {
+//   //     status: order.status,
+//   //     message: order.message,
+//   //   };
+//   // }
+//   // return {
+//   //   status: order.status,
+//   //   message: order.message,
+//   //   data: order.data,
+//   // };
+// };
 
-  if (!order || order.status !== 201) {
-    return {
-      status: order.status,
-      message: order.message,
-    };
-  }
+// const getAllPharmacistOrdersService = async (userId: string) => {
+//   const orders = await orderDataAccess.getAllPharmacistOrders(userId);
 
-  return {
-    status: order.status,
-    message: order.message,
-    data: order.data,
-  };
-};
+//   // if (!orders || orders.status !== 200) {
+//   //   return {
+//   //     status: orders.status,
+//   //     message: orders.message,
+//   //   };
+//   // }
 
-const getAllPharmacistOrdersService = async (userId: string) => {
-  const orders = await orderDataAccess.getAllPharmacistOrders(userId);
+//   // return {
+//   //   status: orders.status,
+//   //   message: orders.message,
+//   //   data: orders.data,
+//   // };
+// };
 
-  if (!orders || orders.status !== 200) {
-    return {
-      status: orders.status,
-      message: orders.message,
-    };
-  }
+// const getOrderByIdService = async (orderId: string) => {
+//   const order = await orderDataAccess.getOrderById(orderId);
 
-  return {
-    status: orders.status,
-    message: orders.message,
-    data: orders.data,
-  };
-};
+//   // if (!order || order.status !== 200) {
+//   //   return {
+//   //     status: order?.status,
+//   //     message: order?.message,
+//   //   };
+//   // }
 
-const getOrderByIdService = async (orderId: string) => {
-  const order = await orderDataAccess.getOrderById(orderId);
+//   // return {
+//   //   status: order.status,
+//   //   message: order.message,
+//   //   data: order.data,
+//   // };
+// };
 
-  if (!order || order.status !== 200) {
-    return {
-      status: order?.status,
-      message: order?.message,
-    };
-  }
+// const updateOrderService = async (
+//   orderId: string,
+//   orderDetails: UpdateOrderSchemaType
+// ) => {
+//   const updatedOrder = await orderDataAccess.updateOrder(orderId, orderDetails);
 
-  return {
-    status: order.status,
-    message: order.message,
-    data: order.data,
-  };
-};
+//   // if (!updatedOrder || updatedOrder.status !== 200) {
+//   //   return {
+//   //     status: updatedOrder?.status,
+//   //     message: updatedOrder?.message,
+//   //   };
+//   // }
 
-const updateOrderService = async (
-  orderId: string,
-  orderDetails: UpdateOrderSchemaType
-) => {
-  const updatedOrder = await orderDataAccess.updateOrder(orderId, orderDetails);
+//   // return {
+//   //   status: updatedOrder.status,
+//   //   message: updatedOrder.message,
+//   //   data: updatedOrder.data,
+//   // };
+// };
 
-  if (!updatedOrder || updatedOrder.status !== 200) {
-    return {
-      status: updatedOrder?.status,
-      message: updatedOrder?.message,
-    };
-  }
+// const cancelOrderService = async (orderId: string, userId: string) => {
+//   const cancelledOrder = await orderDataAccess.cancelOrder(orderId, userId);
 
-  return {
-    status: updatedOrder.status,
-    message: updatedOrder.message,
-    data: updatedOrder.data,
-  };
-};
+//   if (!cancelledOrder || cancelledOrder.status !== 200) {
+//     return {
+//       status: cancelledOrder?.status,
+//       message: cancelledOrder?.message,
+//     };
+//   }
 
-const cancelOrderService = async (orderId: string, userId: string) => {
-  const cancelledOrder = await orderDataAccess.cancelOrder(orderId, userId);
+//   return {
+//     status: cancelledOrder.status,
+//     message: cancelledOrder.message,
+//     data: cancelledOrder.data,
+//   };
+// };
 
-  if (!cancelledOrder || cancelledOrder.status !== 200) {
-    return {
-      status: cancelledOrder?.status,
-      message: cancelledOrder?.message,
-    };
-  }
+// const getAllUserOrdersService = async (userId: string) => {
+//   const orders = await orderDataAccess.getAllUserOrders(userId);
 
-  return {
-    status: cancelledOrder.status,
-    message: cancelledOrder.message,
-    data: cancelledOrder.data,
-  };
-};
+//   // if (!orders || orders.status !== 200) {
+//   //   return {
+//   //     status: orders.status,
+//   //     message: orders.message,
+//   //   };
+//   // }
 
-const getAllUserOrdersService = async (userId: string) => {
-  const orders = await orderDataAccess.getAllUserOrders(userId);
+//   // return {
+//   //   status: orders.status,
+//   //   message: orders.message,
+//   //   data: orders.data,
+//   // };
+// };
 
-  if (!orders || orders.status !== 200) {
-    return {
-      status: orders.status,
-      message: orders.message,
-    };
-  }
+// const deleteOrderService = async (orderId: string, userId: string) => {
+//   // const deletedOrder = await orderDataAccess.deleteOrder(orderId, userId);
+//   // if (!deletedOrder || deletedOrder.status !== 200) {
+//   //   return {
+//   //     status: deletedOrder?.status,
+//   //     message: deletedOrder?.message,
+//   //   };
+//   // }
+//   // return {
+//   //   status: deletedOrder.status,
+//   //   message: deletedOrder.message,
+//   //   data: deletedOrder.data,
+//   // };
+// };
 
-  return {
-    status: orders.status,
-    message: orders.message,
-    data: orders.data,
-  };
-};
-
-const deleteOrderService = async (orderId: string, userId: string) => {
-  const deletedOrder = await orderDataAccess.deleteOrder(orderId, userId);
-
-  if (!deletedOrder || deletedOrder.status !== 200) {
-    return {
-      status: deletedOrder?.status,
-      message: deletedOrder?.message,
-    };
-  }
-
-  return {
-    status: deletedOrder.status,
-    message: deletedOrder.message,
-    data: deletedOrder.data,
-  };
-};
-
-export default {
-  createOrderService,
-  getAllPharmacistOrdersService,
-  getOrderByIdService,
-  updateOrderService,
-  cancelOrderService,
-  getAllUserOrdersService,
-  deleteOrderService,
-};
+// export default {
+//   createOrderService,
+//   getAllPharmacistOrdersService,
+//   getOrderByIdService,
+//   updateOrderService,
+//   cancelOrderService,
+//   getAllUserOrdersService,
+//   deleteOrderService,
+// };

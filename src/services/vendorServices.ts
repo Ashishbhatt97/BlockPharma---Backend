@@ -87,7 +87,7 @@ const addOrganizationService = async (
 };
 
 // Get Organization Service
-const getOrganizationService = async (orgId: number) => {
+const getOrganizationService = async (orgId: string) => {
   const res = await vendorDataAccess.getOrganization(orgId);
 
   if (!res || res.status === 400 || res.status === 500) {
@@ -106,7 +106,7 @@ const getOrganizationService = async (orgId: number) => {
   }
 };
 
-const deleteOrganizationService = async (orgId: number) => {
+const deleteOrganizationService = async (orgId: string) => {
   const res = await vendorDataAccess.deleteOrganization(orgId);
 
   if (!res || res.status === 400) {

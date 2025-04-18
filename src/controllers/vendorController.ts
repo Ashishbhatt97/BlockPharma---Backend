@@ -106,7 +106,7 @@ const getOrganization = asyncHandler(
       return sendResponse(res, 400, { message: "Organization ID is required" });
     }
 
-    const result = await vendorServices.getOrganizationService(Number(orgId));
+    const result = await vendorServices.getOrganizationService(orgId as string);
 
     if (result && result.status !== undefined) {
       sendResponse(res, result.status, result);
@@ -130,7 +130,7 @@ const deleteOrganization = asyncHandler(
     }
 
     const result = await vendorServices.deleteOrganizationService(
-      Number(orgId)
+      orgId as string
     );
 
     if (result && result.status !== undefined) {

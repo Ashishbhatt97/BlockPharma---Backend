@@ -176,22 +176,11 @@ const addOrganization = async (
       };
     }
 
-    const vendorOwnerId = vendorExists.vendorId
-      ? BigInt(vendorExists.vendorId)
-      : undefined;
-
-    if (!vendorOwnerId) {
-      return {
-        status: 400,
-        message: "Vendor not found",
-      };
-    }
-
     const userID = vendorExists.userId;
 
     const organization = await prisma.vendorOrganization.create({
       data: {
-        vendorOwnerId,
+        vendorOwnerId: vendorExists.vendorId,
         phoneNumber: validatedSchema.phoneNumber,
         website: validatedSchema.website || "",
         userId: userID,
@@ -235,11 +224,11 @@ const addOrganization = async (
 };
 
 // Get Organization
-const getOrganization = async (orgId: number) => {
+const getOrganization = async (orgId: string) => {
   try {
     const organization = await prisma.vendorOrganization.findUnique({
       where: {
-        orgId: BigInt(orgId),
+        orgId,
       },
     });
 
@@ -266,11 +255,11 @@ const getOrganization = async (orgId: number) => {
 };
 
 // Delete Organization
-const deleteOrganization = async (orgId: number) => {
+const deleteOrganization = async (orgId: string) => {
   try {
     const organization = await prisma.vendorOrganization.delete({
       where: {
-        orgId: BigInt(orgId),
+        orgId: orgId,
       },
     });
 

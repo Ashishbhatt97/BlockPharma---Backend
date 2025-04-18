@@ -5,10 +5,10 @@ import upload from "../config/upload.config";
 
 const router: Router = express.Router();
 
-router.post("/add", jwtAuth, pharmacistController.addPharmacist);
-router.get("/get", jwtAuth, pharmacistController.getPharmacistById);
-router.get("/getall", jwtAuth, pharmacistController.getAllPharmacists);
-router.delete("/delete", jwtAuth, pharmacistController.deletePharmacist);
+// router.post("/add", jwtAuth, pharmacistController.addPharmacist);
+// router.get("/get", jwtAuth, pharmacistController.getPharmacistById);
+// router.get("/getall", jwtAuth, pharmacistController.getAllPharmacists);
+// router.delete("/delete", jwtAuth, pharmacistController.deletePharmacist);
 
 //Pharmacy Outlet Routes
 router.post("/outlet/add", jwtAuth, pharmacistController.addPharmacyOutlet);

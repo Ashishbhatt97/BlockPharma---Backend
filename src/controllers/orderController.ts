@@ -1,178 +1,178 @@
-import { Response } from "express";
-import sendResponse from "../helper/responseHelper";
-import asyncHandler from "../middleware/asyncHandler";
-import { CustomRequest } from "../middleware/jwtAuthentication";
-import { OrderSchemaType, orderValidationSchema } from "../models/Orders";
-import { orderServices } from "../services/services";
+// import { Response } from "express";
+// import sendResponse from "../helper/responseHelper";
+// import asyncHandler from "../middleware/asyncHandler";
+// import { CustomRequest } from "../middleware/jwtAuthentication";
+// import { OrderSchemaType, orderValidationSchema } from "../models/Orders";
+// import { orderServices } from "../services/services";
 
-// @desc    Create Order
-// @route   POST /api/orders/createOrder
-// @access  POST
-const createOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
-  if (!req.user) {
-    return sendResponse(res, 401, {
-      status: false,
-      message: "Unauthorized",
-    });
-  }
+// // @desc    Create Order
+// // @route   POST /api/orders/createOrder
+// // @access  POST
+// const createOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
+//   if (!req.user) {
+//     return sendResponse(res, 401, {
+//       status: false,
+//       message: "Unauthorized",
+//     });
+//   }
 
-  const { id } = req.user;
+//   const { id } = req.user;
 
-  const orderSchema = {
-    pharmacyOutletId: BigInt(req.body.pharmacyOutletId),
-    orgId: BigInt(req.body.orgId),
-    orderDate: new Date(),
-    orderStatus: req.body.orderStatus,
-    paymentStatus: req.body.paymentStatus,
-    orderItems: req.body.orderItems,
-    currency: req.body.currency,
-    paymentMethod: req.body.paymentMethod,
-    amount: req.body.amount,
-    orderDetails: req.body.orderDetails,
-  };
+//   const orderSchema = {
+//     pharmacyOutletId: BigInt(req.body.pharmacyOutletId),
+//     orgId: BigInt(req.body.orgId),
+//     orderDate: new Date(),
+//     orderStatus: req.body.orderStatus,
+//     paymentStatus: req.body.paymentStatus,
+//     orderItems: req.body.orderItems,
+//     currency: req.body.currency,
+//     paymentMethod: req.body.paymentMethod,
+//     amount: req.body.amount,
+//     orderDetails: req.body.orderDetails,
+//   };
 
-  const validate = orderValidationSchema.safeParse(orderSchema);
+//   const validate = orderValidationSchema.safeParse(orderSchema);
 
-  if (!validate.success) {
-    return sendResponse(res, 400, {
-      status: false,
-      message: validate.error.errors[0].message,
-    });
-  }
+//   if (!validate.success) {
+//     return sendResponse(res, 400, {
+//       status: false,
+//       message: validate.error.errors[0].message,
+//     });
+//   }
 
-  const validatedOrder: OrderSchemaType = validate.data;
+//   const validatedOrder: OrderSchemaType = validate.data;
 
-  const result = await orderServices.createOrderService(id, validatedOrder);
-  if (result.status !== undefined) {
-    sendResponse(res, result.status, result);
-  }
-});
+//   const result = await orderServices.createOrderService(id, validatedOrder);
+//   if (result.status !== undefined) {
+//     sendResponse(res, result.status, result);
+//   }
+// });
 
-// @desc    Get Orders
-// @route   /api/orders/getOrders
-// @access  POST
-const getOrders = asyncHandler(async (req: CustomRequest, res: Response) => {
-  if (!req.user) {
-    return sendResponse(res, 401, {
-      status: false,
-      message: "Unauthorized",
-    });
-  }
+// // @desc    Get Orders
+// // @route   /api/orders/getOrders
+// // @access  POST
+// const getOrders = asyncHandler(async (req: CustomRequest, res: Response) => {
+//   if (!req.user) {
+//     return sendResponse(res, 401, {
+//       status: false,
+//       message: "Unauthorized",
+//     });
+//   }
 
-  const { id } = req.user;
+//   const { id } = req.user;
 
-  const result = await orderServices.getAllPharmacistOrdersService(id);
-  if (result.status !== undefined) {
-    sendResponse(res, result.status, result);
-  }
-});
+//   const result = await orderServices.getAllPharmacistOrdersService(id);
+//   if (result.status !== undefined) {
+//     sendResponse(res, result.status, result);
+//   }
+// });
 
-// @desc    Get Order By Id
-// @route   /api/orders/getOrderById
-// @access  GET
-const getOrderById = asyncHandler(async (req: CustomRequest, res: Response) => {
-  if (!req.user) {
-    return sendResponse(res, 401, {
-      status: false,
-      message: "Unauthorized",
-    });
-  }
+// // @desc    Get Order By Id
+// // @route   /api/orders/getOrderById
+// // @access  GET
+// const getOrderById = asyncHandler(async (req: CustomRequest, res: Response) => {
+//   if (!req.user) {
+//     return sendResponse(res, 401, {
+//       status: false,
+//       message: "Unauthorized",
+//     });
+//   }
 
-  const { orderId } = req.body;
+//   const { orderId } = req.body;
 
-  const result = await orderServices.getOrderByIdService(orderId);
+//   const result = await orderServices.getOrderByIdService(orderId);
 
-  if (result.status !== undefined) {
-    sendResponse(res, result.status, result);
-  }
-});
+//   if (result.status !== undefined) {
+//     sendResponse(res, result.status, result);
+//   }
+// });
 
-// @desc    Update Order
-// @route   /api/orders/updateOrder
-// @access  PUT
-const updateOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
-  if (!req.user) {
-    return sendResponse(res, 401, {
-      status: false,
-      message: "Unauthorized",
-    });
-  }
+// // @desc    Update Order
+// // @route   /api/orders/updateOrder
+// // @access  PUT
+// const updateOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
+//   if (!req.user) {
+//     return sendResponse(res, 401, {
+//       status: false,
+//       message: "Unauthorized",
+//     });
+//   }
 
-  const { orderId } = req.body;
-  const orderDetails = req.body;
+//   const { orderId } = req.body;
+//   const orderDetails = req.body;
 
-  const result = await orderServices.updateOrderService(orderId, orderDetails);
-  if (result.status !== undefined) {
-    sendResponse(res, result.status, result);
-  }
-});
+//   const result = await orderServices.updateOrderService(orderId, orderDetails);
+//   if (result.status !== undefined) {
+//     sendResponse(res, result.status, result);
+//   }
+// });
 
-// @desc    Cancel Order
-// @route   /api/orders/cancelOrder
-// @access  PUT
-const cancelOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
-  if (!req.user) {
-    return sendResponse(res, 401, {
-      status: false,
-      message: "Unauthorized",
-    });
-  }
+// // @desc    Cancel Order
+// // @route   /api/orders/cancelOrder
+// // @access  PUT
+// const cancelOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
+//   if (!req.user) {
+//     return sendResponse(res, 401, {
+//       status: false,
+//       message: "Unauthorized",
+//     });
+//   }
 
-  const { id } = req.user;
-  const { orderId } = req.body;
+//   const { id } = req.user;
+//   const { orderId } = req.body;
 
-  const result = await orderServices.cancelOrderService(orderId, id);
-  if (result.status !== undefined) {
-    sendResponse(res, result.status, result);
-  }
-});
+//   const result = await orderServices.cancelOrderService(orderId, id);
+//   if (result.status !== undefined) {
+//     sendResponse(res, result.status, result);
+//   }
+// });
 
-// @desc    Get All User Orders
-// @route   /api/orders/getAllUserOrders
-// @access  GET
-const getAllUserOrders = asyncHandler(
-  async (req: CustomRequest, res: Response) => {
-    if (!req.user) {
-      return sendResponse(res, 401, {
-        status: false,
-        message: "Unauthorized",
-      });
-    }
-    const { id } = req.user;
+// // @desc    Get All User Orders
+// // @route   /api/orders/getAllUserOrders
+// // @access  GET
+// const getAllUserOrders = asyncHandler(
+//   async (req: CustomRequest, res: Response) => {
+//     if (!req.user) {
+//       return sendResponse(res, 401, {
+//         status: false,
+//         message: "Unauthorized",
+//       });
+//     }
+//     const { id } = req.user;
 
-    const result = await orderServices.getAllUserOrdersService(id);
-    if (result.status !== undefined) {
-      sendResponse(res, result.status, result);
-    }
-  }
-);
+//     const result = await orderServices.getAllUserOrdersService(id);
+//     if (result.status !== undefined) {
+//       sendResponse(res, result.status, result);
+//     }
+//   }
+// );
 
-// @desc    Delete Order
-// @route   /api/orders/deleteOrder
-// @access  DELETE
-const deleteOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
-  if (!req.user) {
-    return sendResponse(res, 401, {
-      status: false,
-      message: "Unauthorized",
-    });
-  }
+// // @desc    Delete Order
+// // @route   /api/orders/deleteOrder
+// // @access  DELETE
+// const deleteOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
+//   if (!req.user) {
+//     return sendResponse(res, 401, {
+//       status: false,
+//       message: "Unauthorized",
+//     });
+//   }
 
-  const { id } = req.user;
-  const { orderId } = req.body;
+//   const { id } = req.user;
+//   const { orderId } = req.body;
 
-  const result = await orderServices.deleteOrderService(orderId, id);
-  if (result.status !== undefined) {
-    sendResponse(res, result.status, result);
-  }
-});
+//   const result = await orderServices.deleteOrderService(orderId, id);
+//   if (result.status !== undefined) {
+//     sendResponse(res, result.status, result);
+//   }
+// });
 
-export default {
-  createOrder,
-  getOrders,
-  getOrderById,
-  updateOrder,
-  cancelOrder,
-  getAllUserOrders,
-  deleteOrder,
-};
+// export default {
+//   createOrder,
+//   getOrders,
+//   getOrderById,
+//   updateOrder,
+//   cancelOrder,
+//   getAllUserOrders,
+//   deleteOrder,
+// };

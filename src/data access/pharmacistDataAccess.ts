@@ -6,180 +6,180 @@ import {
 } from "../models/Pharmacy";
 
 // Add Pharmacist
-const addPharmacist = async (userId: string) => {
-  try {
-    const pharmacistExists = await prisma.pharmacist.findUnique({
-      where: {
-        userId,
-      },
-    });
+// const addPharmacist = async (userId: string) => {
+//   try {
+//     const pharmacistExists = await prisma.pharmacist.findUnique({
+//       where: {
+//         userId,
+//       },
+//     });
 
-    if (pharmacistExists) {
-      return {
-        status: 400,
-        message: "Pharmacist already exists",
-      };
-    }
+//     if (pharmacistExists) {
+//       return {
+//         status: 400,
+//         message: "Pharmacist already exists",
+//       };
+//     }
 
-    const pharmacist = await prisma.pharmacist.create({
-      data: {
-        userId,
-      },
-    });
+//     const pharmacist = await prisma.pharmacist.create({
+//       data: {
+//         userId,
+//       },
+//     });
 
-    if (!pharmacist) {
-      return {
-        status: 400,
-        message: "Error adding pharmacist",
-      };
-    }
+//     if (!pharmacist) {
+//       return {
+//         status: 400,
+//         message: "Error adding pharmacist",
+//       };
+//     }
 
-    const data = pharmacist
-      ? {
-          ...pharmacist,
-          pharmacistId: pharmacist.pharmacistId.toString(), // Convert BigInt to string
-        }
-      : null;
+//     const data = pharmacist
+//       ? {
+//           ...pharmacist,
+//           pharmacistId: pharmacist.pharmacistId.toString(), // Convert BigInt to string
+//         }
+//       : null;
 
-    return {
-      status: 200,
-      message: "Pharmacist added successfully",
-      data,
-    };
-  } catch (error: any) {
-    return {
-      status: 500,
-      message: error.message,
-    };
-  }
-};
+//     return {
+//       status: 200,
+//       message: "Pharmacist added successfully",
+//       data,
+//     };
+//   } catch (error: any) {
+//     return {
+//       status: 500,
+//       message: error.message,
+//     };
+//   }
+// };
 
-// Get Pharmacist
-const getPharmacist = async (userId: string) => {
-  try {
-    const pharmacist = await prisma.pharmacist.findUnique({
-      where: {
-        userId,
-      },
-      include: {
-        pharmacyOutlets: true,
-      },
-    });
+// // Get Pharmacist
+// const getPharmacist = async (userId: string) => {
+//   try {
+//     const pharmacist = await prisma.pharmacist.findUnique({
+//       where: {
+//         userId,
+//       },
+//       include: {
+//         pharmacyOutlets: true,
+//       },
+//     });
 
-    if (!pharmacist) {
-      return {
-        status: 400,
-        message: "Pharmacist not found",
-      };
-    }
+//     if (!pharmacist) {
+//       return {
+//         status: 400,
+//         message: "Pharmacist not found",
+//       };
+//     }
 
-    const data = convertBigIntToString(pharmacist);
+//     const data = convertBigIntToString(pharmacist);
 
-    return {
-      status: 200,
-      message: "Pharmacist found",
-      data,
-    };
-  } catch (error: any) {
-    return {
-      status: 500,
-      message: error.message,
-    };
-  }
-};
+//     return {
+//       status: 200,
+//       message: "Pharmacist found",
+//       data,
+//     };
+//   } catch (error: any) {
+//     return {
+//       status: 500,
+//       message: error.message,
+//     };
+//   }
+// };
 
-// Delete Pharmacist
-const deletePharmacist = async (userId: string) => {
-  try {
-    const pharmacist = await prisma.pharmacist.delete({
-      where: {
-        userId,
-      },
-      include: {
-        pharmacyOutlets: true,
-      },
-    });
+// // Delete Pharmacist
+// const deletePharmacist = async (userId: string) => {
+//   try {
+//     const pharmacist = await prisma.pharmacist.delete({
+//       where: {
+//         userId,
+//       },
+//       include: {
+//         pharmacyOutlets: true,
+//       },
+//     });
 
-    if (!pharmacist) {
-      return {
-        status: 400,
-        message: "Pharmacist not found",
-      };
-    }
+//     if (!pharmacist) {
+//       return {
+//         status: 400,
+//         message: "Pharmacist not found",
+//       };
+//     }
 
-    return {
-      status: 200,
-      message: "Pharmacist deleted successfully",
-    };
-  } catch (error: any) {
-    return {
-      status: 500,
-      message: error.message,
-    };
-  }
-};
+//     return {
+//       status: 200,
+//       message: "Pharmacist deleted successfully",
+//     };
+//   } catch (error: any) {
+//     return {
+//       status: 500,
+//       message: error.message,
+//     };
+//   }
+// };
 
-// Get All Pharmacists
-const getAllPharmacists = async () => {
-  try {
-    const pharmacists = await prisma.pharmacist.findMany();
+// // Get All Pharmacists
+// const getAllPharmacists = async () => {
+//   try {
+//     const pharmacists = await prisma.pharmacist.findMany();
 
-    if (!pharmacists) {
-      return {
-        status: 400,
-        message: "Pharmacists not found",
-        data: [],
-      };
-    }
+//     if (!pharmacists) {
+//       return {
+//         status: 400,
+//         message: "Pharmacists not found",
+//         data: [],
+//       };
+//     }
 
-    const data = convertBigIntToString(pharmacists);
+//     const data = convertBigIntToString(pharmacists);
 
-    return {
-      status: 200,
-      message: "Pharmacists fetched successfully",
-      data,
-    };
-  } catch (error: any) {
-    return {
-      status: 500,
-      message: error.message,
-    };
-  }
-};
+//     return {
+//       status: 200,
+//       message: "Pharmacists fetched successfully",
+//       data,
+//     };
+//   } catch (error: any) {
+//     return {
+//       status: 500,
+//       message: error.message,
+//     };
+//   }
+// };
 
-// Get Pharmacist By Id
-const getPharmacistById = async (id: string) => {
-  try {
-    const pharmacist = await prisma.pharmacist.findUnique({
-      where: {
-        userId: id,
-      },
-      include: {
-        pharmacyOutlets: true,
-      },
-    });
+// // Get Pharmacist By Id
+// const getPharmacistById = async (id: string) => {
+//   try {
+//     const pharmacist = await prisma.pharmacist.findUnique({
+//       where: {
+//         userId: id,
+//       },
+//       include: {
+//         pharmacyOutlets: true,
+//       },
+//     });
 
-    if (!pharmacist) {
-      return {
-        status: 400,
-        message: "Pharmacist not found",
-      };
-    }
+//     if (!pharmacist) {
+//       return {
+//         status: 400,
+//         message: "Pharmacist not found",
+//       };
+//     }
 
-    const data = convertBigIntToString(pharmacist);
+//     const data = convertBigIntToString(pharmacist);
 
-    return {
-      status: 200,
-      message: "Pharmacist fetched successfully",
-      data,
-    };
-  } catch (error: any) {
-    return {
-      status: 500,
-      message: error.message,
-    };
-  }
-};
+//     return {
+//       status: 200,
+//       message: "Pharmacist fetched successfully",
+//       data,
+//     };
+//   } catch (error: any) {
+//     return {
+//       status: 500,
+//       message: error.message,
+//     };
+//   }
+// };
 
 // Add Pharmacy Outlet
 const addPharmacyOutlet = async (
@@ -187,9 +187,10 @@ const addPharmacyOutlet = async (
   validatedSchema: PharmacyOutletType
 ) => {
   try {
-    const pharmacist = await prisma.pharmacist.findUnique({
+    const pharmacist = await prisma.user.findUnique({
       where: {
-        userId,
+        id: userId,
+        role: "PHARMACY",
       },
     });
 
@@ -225,12 +226,11 @@ const addPharmacyOutlet = async (
         message: "Email already exists",
       };
     }
-
+    const { pharmacyOwnerId, ...rest } = validatedSchema;
     const pharmacyOutlet = await prisma.pharmacyOutlet.create({
       data: {
-        ...validatedSchema,
-        pharmacistOwnerId: pharmacist.pharmacistId,
-        userId: pharmacist.userId,
+        ...rest,
+        ownerId: validatedSchema.pharmacyOwnerId,
       },
     });
 
@@ -255,13 +255,12 @@ const addPharmacyOutlet = async (
     };
   }
 };
-
 // Get Pharmacy Outlet By Id
-const getPharmacyOutletById = async (id: number) => {
+const getPharmacyOutletById = async (id: string) => {
   try {
     const pharmacyOutlet = await prisma.pharmacyOutlet.findUnique({
       where: {
-        pharmacyOutletId: BigInt(id),
+        pharmacyOutletId: id,
       },
     });
 
@@ -288,7 +287,7 @@ const getPharmacyOutletById = async (id: number) => {
 };
 
 // Delete Pharmacy Outlet
-const deletePharmacyOutlet = async (pharmacyOutletId: number) => {
+const deletePharmacyOutlet = async (pharmacyOutletId: string) => {
   try {
     const pharmacyOutlet = await prisma.pharmacyOutlet.delete({
       where: {
@@ -321,13 +320,18 @@ const getAllPharmacyOutlets = async () => {
     const pharmacyOutlets = await prisma.pharmacyOutlet.findMany({
       select: {
         pharmacyOutletId: true,
+        ownerId: true,
         gstin: true,
         email: true,
         phoneNumber: true,
         street: true,
+        isActive: true,
         city: true,
         state: true,
         pincode: true,
+        website: true,
+        PharmacyOwnerId: true,
+        businessName: true,
       },
     });
 
@@ -348,13 +352,13 @@ const getAllPharmacyOutlets = async () => {
 
 // Update Pharmacy Outlet
 const updatePharmacyOutlet = async (
-  pharmacyOutletId: number,
+  pharmacyOutletId: string,
   validatedSchema: UpdatePharmacyOutletType
 ) => {
   try {
     const existingPharmacyOutlet = await prisma.pharmacyOutlet.findUnique({
       where: {
-        pharmacyOutletId: BigInt(pharmacyOutletId),
+        pharmacyOutletId: pharmacyOutletId,
       },
     });
 
@@ -365,13 +369,13 @@ const updatePharmacyOutlet = async (
       };
     }
 
+    const { userId, ...dataToUpdate } = validatedSchema;
+
     const pharmacyOutlet = await prisma.pharmacyOutlet.update({
       where: {
-        pharmacyOutletId: BigInt(pharmacyOutletId),
+        pharmacyOutletId: pharmacyOutletId,
       },
-      data: {
-        ...validatedSchema,
-      },
+      data: dataToUpdate,
     });
 
     const data = convertBigIntToString(pharmacyOutlet);
@@ -390,25 +394,25 @@ const updatePharmacyOutlet = async (
 };
 
 //is User a Pharmacist
-const isUserPharmacist = async (userId: string) => {
-  const pharmacist = await prisma.pharmacist.findUnique({
-    where: {
-      userId,
-    },
-  });
-  return pharmacist ? true : false;
-};
+// const isUserPharmacist = async (userId: string) => {
+//   const pharmacist = await prisma.pharmacist.findUnique({
+//     where: {
+//       userId,
+//     },
+//   });
+//   return pharmacist ? true : false;
+// };
 
 export default {
-  addPharmacist,
-  getPharmacist,
-  deletePharmacist,
-  getAllPharmacists,
-  getPharmacistById,
+  // addPharmacist,
+  // getPharmacist,
+  // deletePharmacist,
+  // getAllPharmacists,
+  // getPharmacistById,
   addPharmacyOutlet,
   getPharmacyOutletById,
   deletePharmacyOutlet,
   getAllPharmacyOutlets,
   updatePharmacyOutlet,
-  isUserPharmacist,
+  // isUserPharmacist,
 };

@@ -14,79 +14,77 @@ import {
 // @desc    Add Pharmacist
 // @route   /api/pharmacist/add
 // @access  POST
-const addPharmacist = asyncHandler(
-  async (req: CustomRequest, res: Response) => {
-    if (!req.user) {
-      return sendResponse(res, 401, {
-        status: false,
-        message: "Unauthorized",
-      });
-    }
+// const addPharmacist = asyncHandler(
+//   async (req: CustomRequest, res: Response) => {
+//     if (!req.user) {
+//       return sendResponse(res, 401, {
+//         status: false,
+//         message: "Unauthorized",
+//       });
+//     }
 
-    const { id } = req.user;
-    const result = await pharmacistServices.addPharmacistService(id);
+//     const { id } = req.user;
+//     const result = await pharmacistServices.addPharmacistService(id);
 
-    if (!result || result.status !== undefined) {
-      sendResponse(res, result!.status, result);
-    }
-  }
-);
+//     if (!result || result.status !== undefined) {
+//       sendResponse(res, result!.status, result);
+//     }
+//   }
+// );
 
-// @desc    Get All Pharmacists
-// @route   /api/pharmacist/getall
-// @access  GET
-const getAllPharmacists = asyncHandler(
-  async (req: CustomRequest, res: Response) => {
-    const result = await pharmacistServices.getAllPharmacistsService();
+// // @desc    Get All Pharmacists
+// // @route   /api/pharmacist/getall
+// // @access  GET
+// const getAllPharmacists = asyncHandler(
+//   async (req: CustomRequest, res: Response) => {
+//     const result = await pharmacistServices.getAllPharmacistsService();
 
-    if (!result || result.status !== undefined) {
-      sendResponse(res, result!.status, result);
-    }
-  }
-);
+//     if (!result || result.status !== undefined) {
+//       sendResponse(res, result!.status, result);
+//     }
+//   }
+// );
 
-// @desc    Delete Pharmacist
-// @route   /api/pharmacist/delete
-// @access  DELETE
+// // @desc    Delete Pharmacist
+// // @route   /api/pharmacist/delete
+// // @access  DELETE
 
-const deletePharmacist = asyncHandler(
-  async (req: CustomRequest, res: Response) => {
-    if (!req.user) {
-      return sendResponse(res, 401, {
-        status: false,
-        message: "Unauthorized",
-      });
-    }
+// const deletePharmacist = asyncHandler(
+//   async (req: CustomRequest, res: Response) => {
+//     if (!req.user) {
+//       return sendResponse(res, 401, {
+//         status: false,
+//         message: "Unauthorized",
+//       });
+//     }
 
-    const { id } = req.user;
-    const result = await pharmacistServices.deletePharmacistService(id);
+//     const { id } = req.user;
+//     const result = await pharmacistServices.deletePharmacistService(id);
 
-    if (!result || result.status !== undefined) {
-      sendResponse(res, result!.status, result);
-    }
-  }
-);
+//     if (!result || result.status !== undefined) {
+//       sendResponse(res, result!.status, result);
+//     }
+//   }
+// );
 
-// @desc    Get Pharmacist By Id
-// @route   /api/pharmacist/get
-// @access  GET
-const getPharmacistById = asyncHandler(
-  async (req: CustomRequest, res: Response) => {
-    if (!req.user) {
-      return sendResponse(res, 401, {
-        status: false,
-        message: "Unauthorized",
-      });
-    }
-
-    const { id } = req.user;
-    const result = await pharmacistServices.getPharmacistByIdService(id);
-
-    if (!result || result.status !== undefined) {
-      sendResponse(res, result!.status, result);
-    }
-  }
-);
+// // @desc    Get Pharmacist By Id
+// // @route   /api/pharmacist/get
+// // @access  GET
+// const getPharmacistById = asyncHandler(
+//   async (req: CustomRequest, res: Response) => {
+//     // if (!req.user) {
+//     //   return sendResponse(res, 401, {
+//     //     status: false,
+//     //     message: "Unauthorized",
+//     //   });
+//     // }
+//     // const { id } = req.user;
+//     // const result = await pharmacistServices.getPharmacistByIdService(id);
+//     // if (!result || result.status !== undefined) {
+//     //   sendResponse(res, result!.status, result);
+//     // }
+//   }
+// );
 
 // @desc    Add Pharmacy Outlet
 // @route   /api/pharmacist/outlet/add
@@ -100,24 +98,36 @@ const addPharmacyOutlet = asyncHandler(
       });
     }
 
-    const { id } = req.user;
-    const validatedPharmacySchema = pharmacyOutletSchema.safeParse(req.body);
+    const parsingData = {
+      ...req.body,
+      pharmacyOwnerId: req.body.pharmacyOwnerId,
+    };
 
-    if (validatedPharmacySchema.error) {
+    const validatedPharmacySchema = pharmacyOutletSchema.safeParse(parsingData);
+    if (!validatedPharmacySchema.success) {
       return sendResponse(res, 400, {
-        message: validatedPharmacySchema.error.message,
+        status: false,
+        message:
+          validatedPharmacySchema.error.errors[0].message || "Validation error",
       });
     }
 
     const validatedSchema: PharmacyOutletType = validatedPharmacySchema.data;
+    const { pharmacyOwnerId: pharmacyOwner } = validatedSchema;
+    try {
+      const result = await pharmacistServices.addPharmacyOutletService(
+        pharmacyOwner!.toString(),
+        validatedSchema
+      );
 
-    const result = await pharmacistServices.addPharmacyOutletService(
-      id,
-      validatedSchema
-    );
-
-    if (!result || result.status !== undefined) {
-      sendResponse(res, result!.status, result);
+      if (!result || result.status !== undefined) {
+        return sendResponse(res, result!.status, result);
+      }
+    } catch (error: any) {
+      return sendResponse(res, 500, {
+        status: false,
+        message: error.message || "Internal server error",
+      });
     }
   }
 );
@@ -133,10 +143,10 @@ const getPharmacyOutletById = asyncHandler(
         message: "Unauthorized",
       });
     }
-    const pharmacyOutletId = req.query.pharmacyOutletId;
+    const { pharmacyOutletId } = req.body;
 
     const result = await pharmacistServices.getPharmacyOutletByIdService(
-      Number(pharmacyOutletId)
+      pharmacyOutletId
     );
 
     if (!result || result.status !== undefined) {
@@ -157,10 +167,10 @@ const deletePharmacyOutlet = asyncHandler(
       });
     }
 
-    const pharmacyOutletId = req.query.pharmacyOutletId;
+    const pharmacyOutletId = req.body;
 
     const result = await pharmacistServices.deletePharmacyOutletService(
-      Number(pharmacyOutletId)
+      pharmacyOutletId
     );
 
     if (!result || result.status !== undefined) {
@@ -194,7 +204,7 @@ const updatePharmacyOutlet = asyncHandler(
       });
     }
 
-    const pharmacyOutletId = req.query.pharmacyOutletId;
+    const { pharmacyOutletId } = req.body;
     const validatedPharmacySchema = updatePharmacyOutletSchema.safeParse(
       req.body
     );
@@ -209,7 +219,7 @@ const updatePharmacyOutlet = asyncHandler(
       validatedPharmacySchema.data;
 
     const result = await pharmacistServices.updatePharmacyOutletService(
-      Number(pharmacyOutletId),
+      pharmacyOutletId,
       validatedSchema
     );
 
@@ -220,10 +230,10 @@ const updatePharmacyOutlet = asyncHandler(
 );
 
 export default {
-  addPharmacist,
-  getAllPharmacists,
-  deletePharmacist,
-  getPharmacistById,
+  // addPharmacist,
+  // getAllPharmacists,
+  // deletePharmacist,
+  // getPharmacistById,
   addPharmacyOutlet,
   getPharmacyOutletById,
   deletePharmacyOutlet,

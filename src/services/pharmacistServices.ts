@@ -5,68 +5,67 @@ import {
 } from "../models/Pharmacy";
 
 const addPharmacistService = async (id: string) => {
-  const res = await pharmacistDataAccess.addPharmacist(id);
-  if (!res || res.status === 400 || res.status === 500) {
-    return {
-      status: res.status,
-      error: res.message,
-    };
-  }
-  if (res.status === 200) {
-    return {
-      status: 200,
-      message: res.message,
-    };
-  }
+  // const res = await pharmacistDataAccess.addPharmacist(id);
+  // if (!res || res.status === 400 || res.status === 500) {
+  //   return {
+  //     status: res.status,
+  //     error: res.message,
+  //   };
+  // }
+  // if (res.status === 200) {
+  //   return {
+  //     status: 200,
+  //     message: res.message,
+  //   };
+  // }
 };
 
 const getAllPharmacistsService = async () => {
-  const res = await pharmacistDataAccess.getAllPharmacists();
-  if (!res || res.status === 400 || res.status === 500) {
-    return {
-      status: res.status,
-      error: res.message,
-    };
-  }
-  if (res.status === 200) {
-    return {
-      status: 200,
-      data: res.data,
-    };
-  }
+  // const res = await pharmacistDataAccess.getAllPharmacists();
+  // if (!res || res.status === 400 || res.status === 500) {
+  //   return {
+  //     status: res.status,
+  //     error: res.message,
+  //   };
+  // }
+  // if (res.status === 200) {
+  //   return {
+  //     status: 200,
+  //     data: res.data,
+  //   };
+  // }
 };
 
 const deletePharmacistService = async (id: string) => {
-  const res = await pharmacistDataAccess.deletePharmacist(id);
-
-  if (!res || res.status === 400 || res.status === 500) {
-    return {
-      status: res.status,
-      error: res.message,
-    };
-  }
-  if (res.status === 200) {
-    return {
-      status: 200,
-      message: res.message,
-    };
-  }
+  // const res = await pharmacistDataAccess.deletePharmacist(id);
+  // if (!res || res.status === 400 || res.status === 500) {
+  //   return {
+  //     status: res.status,
+  //     error: res.message,
+  //   };
+  // }
+  // if (res.status === 200) {
+  //   return {
+  //     status: 200,
+  //     message: res.message,
+  //   };
+  // }
 };
 
 const getPharmacistByIdService = async (id: string) => {
-  const res = await pharmacistDataAccess.getPharmacistById(id);
-  if (!res || res.status === 400 || res.status === 500) {
-    return {
-      status: res.status,
-      error: res.message,
-    };
-  }
-  if (res.status === 200) {
-    return {
-      status: 200,
-      data: res.data,
-    };
-  }
+  // const res = await pharmacistDataAccess.getPharmacistById(id);
+  // if (!res || res.status === 400 || res.status === 500) {
+  //   return {
+  //     status: res.status,
+  //     error: res.message,
+  //   };
+  // }
+  // if (res.status === 200) {
+  //   return {
+  //     status: 200,
+  //     data: res.data,
+  //   };
+  // }
 };
 
 const addPharmacyOutletService = async (
@@ -92,7 +91,7 @@ const addPharmacyOutletService = async (
   }
 };
 
-const getPharmacyOutletByIdService = async (id: number) => {
+const getPharmacyOutletByIdService = async (id: string) => {
   const res = await pharmacistDataAccess.getPharmacyOutletById(id);
   if (!res || res.status === 400 || res.status === 500) {
     return {
@@ -108,7 +107,7 @@ const getPharmacyOutletByIdService = async (id: number) => {
   }
 };
 
-const deletePharmacyOutletService = async (pharmacyOutletId: number) => {
+const deletePharmacyOutletService = async (pharmacyOutletId: string) => {
   const res = await pharmacistDataAccess.deletePharmacyOutlet(pharmacyOutletId);
   if (!res || res.status === 400 || res.status === 500) {
     return {
@@ -141,7 +140,7 @@ const getAllPharmacyOutletsService = async () => {
 };
 
 const updatePharmacyOutletService = async (
-  pharmacyOutletId: number,
+  pharmacyOutletId: string,
   validatedSchema: UpdatePharmacyOutletType
 ) => {
   const res = await pharmacistDataAccess.updatePharmacyOutlet(

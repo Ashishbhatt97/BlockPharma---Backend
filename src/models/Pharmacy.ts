@@ -1,17 +1,12 @@
 import { z } from "zod";
 
 export const pharmacyOutletSchema = z.object({
-  pharmacyOutletId: z.bigint().optional(),
-  pharmacistOwnerId: z.bigint().optional(),
+  pharmacyOwnerId: z.string().min(1, "Pharmacy owner ID is required"),
   businessName: z.string().min(1, "Business name is required"),
   street: z.string().min(1, "Street is required"),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
-  pincode: z
-    .number()
-    .int()
-    .min(100000, "Pincode must be 6 digits")
-    .max(999999, "Pincode must be 6 digits"),
+  pincode: z.string().length(6, "Pincode must be 6 digits"),
   phoneNumber: z
     .string()
     .min(10, "Phone number must be at least 10 digits")
@@ -27,18 +22,13 @@ export const pharmacyOutletSchema = z.object({
 });
 
 export const updatePharmacyOutletSchema = z.object({
-  pharmacyOutletId: z.bigint().optional(),
-  pharmacistOwnerId: z.bigint().optional(),
+  pharmacyOutletId: z.string().optional(),
+  pharmacistOwnerId: z.string().optional(),
   businessName: z.string().min(1, "Business name is required").optional(),
   street: z.string().min(1, "Street is required").optional(),
   city: z.string().min(1, "City is required").optional(),
   state: z.string().min(1, "State is required").optional(),
-  pincode: z
-    .number()
-    .int()
-    .min(100000, "Pincode must be 6 digits")
-    .max(999999, "Pincode must be 6 digits")
-    .optional(),
+  pincode: z.string().length(6, "Pincode must be 6 digits"),
   phoneNumber: z
     .string()
     .min(10, "Phone number must be at least 10 digits")

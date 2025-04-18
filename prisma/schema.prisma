@@ -23,13 +23,12 @@ model User {
   Address            Address?
   VendorOwner        VendorOwner?
   VendorOrganization VendorOrganization[]
-  Pharmacist         Pharmacist?
   PharmacyOutlet     PharmacyOutlet[]
   Orders             Orders[]
 }
 
 model Address {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   userId    String   @unique
   street    String
   city      String
@@ -42,7 +41,7 @@ model Address {
 }
 
 model VendorOwner {
-  vendorId            BigInt               @id @default(autoincrement())
+  vendorId            String               @id @default(uuid())
   userId              String               @unique
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
@@ -51,8 +50,8 @@ model VendorOwner {
 }
 
 model VendorOrganization {
-  orgId         BigInt      @id @default(autoincrement())
-  vendorOwnerId BigInt
+  orgId         String      @unique @default(uuid())
+  vendorOwnerId String
   businessName  String
   gstin         String      @unique
   email         String      @unique
@@ -71,41 +70,30 @@ model VendorOrganization {
   Orders        Orders[]
 }
 
-model Pharmacist {
-  pharmacistId    BigInt           @id @default(autoincrement())
-  userId          String           @unique
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  user            User             @relation(fields: [userId], references: [id])
-  pharmacyOutlets PharmacyOutlet[]
-}
-
 model PharmacyOutlet {
-  pharmacyOutletId  BigInt     @id @default(autoincrement())
-  pharmacistOwnerId BigInt
-  businessName      String
-  street            String
-  city              String
-  state             String
-  pincode           Int
-  phoneNumber       String
-  gstin             String     @unique
-  email             String     @unique
-  website           String?
-  userId            String
-  isActive          Boolean    @default(true)
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
-  user              User       @relation(fields: [userId], references: [id])
-  pharmacist        Pharmacist @relation(fields: [pharmacistOwnerId], references: [pharmacistId])
-  Orders            Orders[]
+  pharmacyOutletId String   @id @default(uuid())
+  ownerId          String
+  businessName     String
+  street           String
+  city             String
+  state            String
+  pincode          String
+  phoneNumber      String
+  gstin            String   @unique
+  email            String   @unique
+  website          String?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  PharmacyOwnerId  User     @relation(fields: [ownerId], references: [id])
+  Orders           Orders[]
 }
 
 model Orders {
   orderId          String             @id
   userId           String
-  pharmacyOutletId BigInt
-  orgId            BigInt
+  pharmacyOutletId String
+  orgId            String
   orderDate        DateTime
   orderStatus      orderStatus        @default(PENDING)
   paymentStatus    paymentStatus      @default(PENDING)
@@ -121,9 +109,9 @@ model Orders {
 }
 
 model OrderItems {
-  orderItemId BigInt   @id @default(autoincrement())
+  orderItemId String   @id @default(uuid())
   orderId     String
-  productId   BigInt
+  productId   String
   quantity    Int
   price       Float
   createdAt   DateTime @default(now())

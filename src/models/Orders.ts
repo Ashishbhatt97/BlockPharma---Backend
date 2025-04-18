@@ -33,11 +33,11 @@ export const orderValidationSchema = z.object({
       invalid_type_error: "User ID must be a string.",
     })
     .optional(),
-  pharmacyOutletId: z.bigint({
+  pharmacyOutletId: z.string({
     required_error: "Pharmacy Outlet ID is required.",
     invalid_type_error: "Pharmacy Outlet ID must be a BigInt.",
   }),
-  orgId: z.bigint({
+  orgId: z.string({
     required_error: "Organization ID is required.",
     invalid_type_error: "Organization ID must be a BigInt.",
   }),

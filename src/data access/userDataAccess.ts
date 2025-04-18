@@ -454,14 +454,14 @@ const deleteUserAndRelatedData = async (userId: string) => {
     }
 
     // Check and delete PharmacyOutlet records (children of Pharmacist)
-    const pharmacyOutlets = await prisma.pharmacyOutlet.findMany({
-      where: { userId },
-    });
-    if (pharmacyOutlets.length > 0) {
-      await prisma.pharmacyOutlet.deleteMany({
-        where: { userId },
-      });
-    }
+    // const pharmacyOutlets = await prisma.pharmacyOutlet.findMany({
+    //   where: { userId },
+    // });
+    // if (pharmacyOutlets.length > 0) {
+    //   await prisma.pharmacyOutlet.deleteMany({
+    //     where: { userId },
+    //   });
+    // }
 
     // Check and delete VendorOwner (has a unique constraint on userId)
     const vendorOwner = await prisma.vendorOwner.findUnique({
@@ -469,16 +469,6 @@ const deleteUserAndRelatedData = async (userId: string) => {
     });
     if (vendorOwner) {
       await prisma.vendorOwner.delete({
-        where: { userId },
-      });
-    }
-
-    // Check and delete Pharmacist (has a unique constraint on userId)
-    const pharmacist = await prisma.pharmacist.findUnique({
-      where: { userId },
-    });
-    if (pharmacist) {
-      await prisma.pharmacist.delete({
         where: { userId },
       });
     }
