@@ -19,7 +19,7 @@ router.get(
   pharmacistController.getAllPharmacyOutlets
 );
 router.delete(
-  "/outlet/delete",
+  "/outlet/delete/:id",
   jwtAuth,
   pharmacistController.deletePharmacyOutlet
 );

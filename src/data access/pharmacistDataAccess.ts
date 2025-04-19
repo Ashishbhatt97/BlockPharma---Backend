@@ -260,7 +260,7 @@ const getPharmacyOutletById = async (id: string) => {
   try {
     const pharmacyOutlet = await prisma.pharmacyOutlet.findUnique({
       where: {
-        pharmacyOutletId: id,
+        id,
       },
     });
 
@@ -287,11 +287,11 @@ const getPharmacyOutletById = async (id: string) => {
 };
 
 // Delete Pharmacy Outlet
-const deletePharmacyOutlet = async (pharmacyOutletId: string) => {
+const deletePharmacyOutlet = async (id: string) => {
   try {
     const pharmacyOutlet = await prisma.pharmacyOutlet.delete({
       where: {
-        pharmacyOutletId,
+        id,
       },
     });
 
@@ -319,7 +319,7 @@ const getAllPharmacyOutlets = async () => {
   try {
     const pharmacyOutlets = await prisma.pharmacyOutlet.findMany({
       select: {
-        pharmacyOutletId: true,
+        id: true,
         ownerId: true,
         gstin: true,
         email: true,
@@ -330,7 +330,7 @@ const getAllPharmacyOutlets = async () => {
         state: true,
         pincode: true,
         website: true,
-        PharmacyOwnerId: true,
+        owner: true,
         businessName: true,
       },
     });
@@ -352,13 +352,13 @@ const getAllPharmacyOutlets = async () => {
 
 // Update Pharmacy Outlet
 const updatePharmacyOutlet = async (
-  pharmacyOutletId: string,
+  id: string,
   validatedSchema: UpdatePharmacyOutletType
 ) => {
   try {
     const existingPharmacyOutlet = await prisma.pharmacyOutlet.findUnique({
       where: {
-        pharmacyOutletId: pharmacyOutletId,
+        id,
       },
     });
 
@@ -373,7 +373,7 @@ const updatePharmacyOutlet = async (
 
     const pharmacyOutlet = await prisma.pharmacyOutlet.update({
       where: {
-        pharmacyOutletId: pharmacyOutletId,
+        id,
       },
       data: dataToUpdate,
     });

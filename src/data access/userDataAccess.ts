@@ -319,9 +319,9 @@ const getUserById = async (userId: string) => {
         id: userId,
       },
       include: {
-        Address: true,
-        VendorOrganization: true,
-        PharmacyOutlet: true,
+        address: true,
+        vendorOrganizations: true,
+        pharmacyOutlets: true,
       },
     });
 
@@ -433,7 +433,6 @@ const updateAddress = async (userId: string, addressObj: AddressSchemaType) => {
 
 const deleteUserAndRelatedData = async (userId: string) => {
   const deletedUser = await prisma.$transaction(async (prisma) => {
-    // Check and delete Address (has a unique constraint on userId)
     const address = await prisma.address.findUnique({
       where: { userId },
     });
@@ -443,15 +442,14 @@ const deleteUserAndRelatedData = async (userId: string) => {
       });
     }
 
-    // Check and delete VendorOrganization records
-    const vendorOrganizations = await prisma.vendorOrganization.findMany({
-      where: { userId },
-    });
-    if (vendorOrganizations.length > 0) {
-      await prisma.vendorOrganization.deleteMany({
-        where: { userId },
-      });
-    }
+    // const vendorOrganizations = await prisma.vendorOrganization.findMany({
+    //   where: { userId: userId },
+    // });
+    // if (vendorOrganizations.length > 0) {
+    //   await prisma.vendorOrganization.deleteMany({
+    //     where: { userId: userId },
+    //   });
+    // }
 
     // Check and delete PharmacyOutlet records (children of Pharmacist)
     // const pharmacyOutlets = await prisma.pharmacyOutlet.findMany({
@@ -462,16 +460,6 @@ const deleteUserAndRelatedData = async (userId: string) => {
     //     where: { userId },
     //   });
     // }
-
-    // Check and delete VendorOwner (has a unique constraint on userId)
-    const vendorOwner = await prisma.vendorOwner.findUnique({
-      where: { userId },
-    });
-    if (vendorOwner) {
-      await prisma.vendorOwner.delete({
-        where: { userId },
-      });
-    }
 
     // Mark the user as deleted
     const updatedUser = await prisma.user.update({
@@ -506,7 +494,7 @@ const completeProfile = async (
         role: userObj.role,
         phoneNumber: userObj.phoneNumber,
         isProfileCompleted: true,
-        Address: {
+        address: {
           create: {
             street: userObj.street,
             city: userObj.city,
@@ -515,9 +503,6 @@ const completeProfile = async (
             zipCode: userObj.zipCode,
           },
         },
-      },
-      include: {
-        Address: true,
       },
     });
 

@@ -167,7 +167,7 @@ const deletePharmacyOutlet = asyncHandler(
       });
     }
 
-    const pharmacyOutletId = req.body;
+    const pharmacyOutletId = req.params.id;
 
     const result = await pharmacistServices.deletePharmacyOutletService(
       pharmacyOutletId

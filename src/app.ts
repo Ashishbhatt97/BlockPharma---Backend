@@ -28,7 +28,7 @@ app.use("/api/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
 app.use("/api/user", userRoutes);
-app.use("/api/vendor", vendorRoutes);
+app.use("/api/supplier", vendorRoutes);
 app.use("/api/pharmacy", pharmacistRoutes);
 // app.use("/api/orders", orderRoutes);
 

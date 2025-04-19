@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const VendorOrganizationSchema = z.object({
-  orgId: z.bigint().optional(),
-  vendorOwnerId: z.bigint().optional(),
+  orgId: z.string().uuid().optional(),
+  vendorOwnerId: z.string(),
   userId: z
     .string()
     .uuid({ message: "Invalid user ID format. Must be a UUID." })
@@ -39,22 +39,6 @@ export const VendorOrganizationSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export const VendorOwnerSchema = z.object({
-  vendorId: z.bigint().optional(),
-  userId: z
-    .string()
-    .uuid({ message: "Invalid user ID format. Must be a UUID." })
-    .optional(),
-  VendorOrganizations: z
-    .array(
-      z.string().uuid({
-        message: "Invalid organization ID format in array. Must be a UUID.",
-      })
-    )
-    .optional(),
-});
-
-export type VendorSchemaType = z.infer<typeof VendorOwnerSchema>;
 export type VendorOrganizationSchemaType = z.infer<
   typeof VendorOrganizationSchema
 >;
