@@ -14,7 +14,6 @@ const addVendorOrganization = async (
         role: "SUPPLIER",
       },
     });
-    console.log(userExists);
     if (!userExists) {
       return {
         status: 400,

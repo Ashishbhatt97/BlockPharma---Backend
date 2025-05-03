@@ -34,7 +34,6 @@ const userRegisterService = async (userObj: RegisterSchemaType) => {
 const userLoginService = async (userObj: loginSchemaType) => {
   try {
     const res = await userDataAccess.loginUser(userObj);
-
     if (!res) return { error: "Invalid Credentials", status: 400 };
 
     if (res) {

@@ -10,18 +10,14 @@ import {
 
 import {
   VendorOrganizationSchema,
-  VendorOwnerSchema,
   VendorOrganizationSchemaType,
-  VendorSchemaType,
 } from "./Vendor";
 
 export {
   loginSchema,
   signupSchema,
   VendorOrganizationSchema,
-  VendorOwnerSchema,
   VendorOrganizationSchemaType,
-  VendorSchemaType,
   RegisterSchemaType,
   loginSchemaType,
   updateUserSchema,

@@ -40,26 +40,27 @@ model Address {
 }
 
 model VendorOrganization {
-  id           String   @id @default(uuid())
+  id           String    @id @default(uuid())
   ownerId      String
   businessName String
-  gstin        String   @unique
-  email        String   @unique
+  gstin        String    @unique
+  email        String    @unique
   street       String
   city         String
   state        String
   pincode      String
-  isActive     Boolean  @default(true)
+  isActive     Boolean   @default(true)
   phoneNumber  String
   website      String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  owner        User     @relation(fields: [ownerId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  owner        User      @relation(fields: [ownerId], references: [id])
   orders       Order[]
+  products     Product[]
 }
 
 model PharmacyOutlet {
-  id           String   @id @default(uuid())
+  id           String          @id @default(uuid())
   ownerId      String
   businessName String
   street       String
@@ -67,14 +68,15 @@ model PharmacyOutlet {
   state        String
   pincode      String
   phoneNumber  String
-  gstin        String   @unique
-  email        String   @unique
+  gstin        String          @unique
+  email        String          @unique
   website      String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  owner        User     @relation(fields: [ownerId], references: [id])
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  owner        User            @relation(fields: [ownerId], references: [id])
   orders       Order[]
+  inventory    InventoryItem[]
 }
 
 model Order {
@@ -105,6 +107,38 @@ model OrderItem {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Product {
+  id          String             @id @default(uuid())
+  name        String
+  description String?
+  brand       String
+  category    String
+  image       String?
+  unit        String
+  price       Float
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  vendorOrg   VendorOrganization @relation(fields: [vendorOrgId], references: [id])
+  vendorOrgId String
+  inventory   InventoryItem[]
+  OrderItem   OrderItem[]
+}
+
+model InventoryItem {
+  id               String         @id @default(uuid())
+  productId        String
+  pharmacyOutletId String
+  stock            Int
+  threshold        Int
+  expiry           DateTime
+  batchNumber      String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  product          Product        @relation(fields: [productId], references: [id])
+  pharmacyOutlet   PharmacyOutlet @relation(fields: [pharmacyOutletId], references: [id])
 }
 
 enum Role {

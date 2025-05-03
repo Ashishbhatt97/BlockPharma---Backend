@@ -55,7 +55,6 @@ const userLogin = asyncHandler(async (req: Request, res: Response) => {
   const validatedData: loginSchemaType = parseResult.data;
 
   const result = await userServices.userLoginService(validatedData);
-
   if (result?.status !== undefined) {
     sendResponse(res, result.status, result);
   }

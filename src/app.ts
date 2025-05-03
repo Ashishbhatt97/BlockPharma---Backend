@@ -5,6 +5,7 @@ import morgan from "morgan";
 import { userRoutes, vendorRoutes, pharmacistRoutes } from "./routes/routes";
 import bodyParser from "body-parser";
 import path from "path";
+import { getDashboardCounts } from "./controllers/countsController";
 require("dotenv").config();
 
 //initiate the server
@@ -27,9 +28,11 @@ app.use(cors());
 app.use("/api/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 // Routes
+app.use("/api/counts", getDashboardCounts);
 app.use("/api/user", userRoutes);
 app.use("/api/supplier", vendorRoutes);
 app.use("/api/pharmacy", pharmacistRoutes);
+
 // app.use("/api/orders", orderRoutes);
 
 app.listen(PORT, () => {

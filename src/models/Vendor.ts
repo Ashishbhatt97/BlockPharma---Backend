@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const VendorOrganizationSchema = z.object({
   orgId: z.string().uuid().optional(),
-  vendorOwnerId: z.string(),
+  ownerId: z.string(),
   userId: z
     .string()
     .uuid({ message: "Invalid user ID format. Must be a UUID." })
