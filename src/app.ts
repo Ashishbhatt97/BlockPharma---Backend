@@ -24,6 +24,10 @@ app.use(morgan("dev"));
 // Enable CORS
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.send("Server is ok and running");
+});
+
 // Static file serving (e.g., profile pictures)
 app.use("/api/uploads", express.static(path.join(process.cwd(), "uploads")));
 
