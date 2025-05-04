@@ -1,311 +1,112 @@
-// import prisma from "../config/db.config";
-// import pharmacistDataAccess from "./pharmacistDataAccess";
-// import convertBigIntToString from "../helper/convertBigIntToString";
-// import { OrderSchemaType, UpdateOrderSchemaType } from "../models/Orders";
-// import { orderStatus, paymentMethod, paymentStatus } from "@prisma/client";
+import prisma from "../config/db.config";
+import { OrderStatus } from "@prisma/client";
 
-// type OrderItemSchemaType = {
-//   productId: string;
-//   quantity: number;
-//   price: number;
-// };
+const createOrder = async (orderData: any) => {
+  return await prisma.$transaction(async (prisma) => {
+    const order = await prisma.order.create({
+      data: {
+        userId: orderData.userId,
+        pharmacyOutletId: orderData.pharmacyOutletId,
+        vendorOrgId: orderData.vendorOrgId,
+        paymentMethod: orderData.paymentMethod,
+        amount: orderData.amount || 0,
+        blockchainTxHash: orderData.blockchainTxHash,
+        orderDate: new Date(), // Add orderDate
+        user: {
+          connect: { id: orderData.userId }, // Connect user relation
+        },
+        pharmacyOutlet: {
+          connect: { id: orderData.pharmacyOutletId }, // Connect pharmacyOutlet relation
+        },
+        vendorOrg: {
+          connect: { id: orderData.vendorOrgId }, // Connect vendorOrg relation
+        },
+        orderItems: {
+          create: orderData.orderItems.map((item: any) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      },
+      include: {
+        orderItems: true,
+      },
+    });
 
-// //create order
-// const createOrder = async (id: string, validatedOrder: OrderSchemaType) => {
-//   // try {
-//   //   const isPharmacist = await pharmacistDataAccess.isUserPharmacist(id);
-//   //   if (!isPharmacist) {
-//   //     return {
-//   //       status: 403,
-//   //       message: "User is not a pharmacist",
-//   //     };
-//   //   }
-//   //   const order = await prisma.orders.create({
-//   //     data: {
-//   //       orderId: `ORD-${
-//   //         id.trim().substring(0, 3) + Math.floor(Math.random() * 1000000)
-//   //       }`,
-//   //       userId: id,
-//   //       pharmacyOutletId: validatedOrder.pharmacyOutletId,
-//   //       orgId: validatedOrder.orgId,
-//   //       orderDate: new Date(),
-//   //       amount: validatedOrder.amount,
-//   //       currency: validatedOrder.currency,
-//   //       paymentMethod: validatedOrder.paymentMethod as paymentMethod,
-//   //       orderStatus: validatedOrder.orderStatus as orderStatus,
-//   //       paymentStatus: validatedOrder.paymentStatus as paymentStatus,
-//   //     },
-//   //   });
-//   //   const orderItems = await createOrderItem(
-//   //     order.orderId,
-//   //     validatedOrder.orderItems
-//   //   );
-//   //   if (!order || !orderItems) {
-//   //     return {
-//   //       status: 400,
-//   //       message: "Order creation failed",
-//   //     };
-//   //   }
-//   //   const orderData = convertBigIntToString(order);
-//   //   return {
-//   //     status: 201,
-//   //     message: "Order created successfully",
-//   //     data: orderData,
-//   //   };
-//   // } catch (error: any) {
-//   //   return {
-//   //     status: 500,
-//   //     message: error.message,
-//   //   };
-//   // }
-// };
+    // 2. Update inventory (optional)
+    await Promise.all(
+      orderData.orderItems.map((item: any) =>
+        prisma.inventoryItem.updateMany({
+          where: {
+            productId: item.productId,
+            pharmacyOutletId: orderData.pharmacyOutletId,
+          },
+          data: {
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        })
+      )
+    );
 
-// //get all orders for a pharmacist
-// const getAllPharmacistOrders = async (userId: string) => {
-//   // try {
-//   //   const isPharmacist = await pharmacistDataAccess.isUserPharmacist(userId);
-//   //   if (!isPharmacist) {
-//   //     return {
-//   //       status: 403,
-//   //       message: "User is not a pharmacist",
-//   //     };
-//   //   }
-//   //   const orders = await prisma.orders.findMany({
-//   //     where: {
-//   //       userId,
-//   //     },
-//   //   });
-//   //   if (!orders) {
-//   //     return {
-//   //       status: 404,
-//   //       message: "Orders not found",
-//   //     };
-//   //   }
-//   //   return {
-//   //     status: 200,
-//   //     message: "Orders fetched successfully",
-//   //     data: orders,
-//   //   };
-//   // } catch (error: any) {
-//   //   return {
-//   //     status: 500,
-//   //     message: error.message,
-//   //   };
-//   // }
-// };
+    return order;
+  });
+};
 
-// //create order item
-// const createOrderItem = async (
-//   orderId: string,
-//   orderItems: OrderItemSchemaType[]
-// ) => {
-//   // try {
-//   //   const orderItem = await prisma.orderItems.createMany({
-//   //     data: orderItems.map((item) => ({
-//   //       orderId,
-//   //       productId: item.productId,
-//   //       quantity: item.quantity,
-//   //       price: item.price,
-//   //     })),
-//   //   });
-//   //   if (!orderItem || orderItem.count === 0) {
-//   //     return null;
-//   //   }
-//   //   return orderItem;
-//   // } catch (error: any) {
-//   //   return null;
-//   // }
-// };
+const updateOrderStatus = async (
+  orderId: string,
+  status: OrderStatus,
+  blockchainTxHash?: string
+) => {
+  return await prisma.order.update({
+    where: { id: orderId },
+    data: {
+      orderStatus: status,
+      ...(blockchainTxHash && { blockchainTxHash }),
+    },
+    include: {
+      orderItems: {
+        include: {
+          product: true,
+        },
+      },
+      pharmacyOutlet: true,
+      vendorOrg: true,
+    },
+  });
+};
 
-// //get order by id
-// const getOrderById = async (orderId: string) => {
-//   // try {
-//   //   const order = await prisma.orders.findUnique({
-//   //     where: {
-//   //       orderId,
-//   //     },
-//   //   });
-//   //   if (!order) {
-//   //     return {
-//   //       status: 404,
-//   //       message: "Order not found",
-//   //     };
-//   //   }
-//   //   const orderData = convertBigIntToString(order);
-//   //   const orderItems = await prisma.orderItems.findMany({
-//   //     where: {
-//   //       orderId,
-//   //     },
-//   //   });
-//   //   const orderItemsData = convertBigIntToString(orderItems);
-//   //   return {
-//   //     status: 200,
-//   //     message: "Order fetched successfully",
-//   //     data: {
-//   //       ...orderData,
-//   //       orderItems: orderItemsData,
-//   //     },
-//   //   };
-//   // } catch (error: any) {
-//   //   return {
-//   //     status: 500,
-//   //     message: error.message,
-//   //   };
-//   // }
-// };
+const getOrderForVendor = async (orderId: string, vendorUserId?: string) => {
+  return await prisma.order.findFirst({
+    where: {
+      id: orderId,
+      vendorOrg: {
+        ownerId: vendorUserId,
+      },
+    },
+  });
+};
 
-// //update order
-// const updateOrder = async (orderId: string, order: UpdateOrderSchemaType) => {
-//   // try {
-//   //   const updatedOrder = await prisma.orders.update({
-//   //     where: {
-//   //       orderId,
-//   //     },
-//   //     data: {
-//   //       orderStatus: order.orderStatus as orderStatus,
-//   //       paymentStatus: order.paymentStatus as paymentStatus,
-//   //     },
-//   //   });
-//   //   if (!updatedOrder) {
-//   //     return {
-//   //       status: 404,
-//   //       message: "Order not found",
-//   //     };
-//   //   }
-//   //   const updatedOrderData = convertBigIntToString(updatedOrder);
-//   //   return {
-//   //     status: 200,
-//   //     message: "Order updated successfully",
-//   //     data: updatedOrderData,
-//   //   };
-//   // } catch (error: any) {
-//   //   return {
-//   //     status: 500,
-//   //     message: error.message,
-//   //   };
-//   // }
-// };
+const createBlockchainRecord = async (data: {
+  txHash: string;
+  orderId?: string;
+  action: string;
+}) => {
+  return await prisma.blockchainRecord.create({
+    data: {
+      txHash: data.txHash,
+      orderId: data.orderId,
+      action: data.action,
+      timestamp: new Date(),
+    },
+  });
+};
 
-// //cancel order
-// const cancelOrder = async (orderId: string, userId: string) => {
-//   try {
-//     // const isPharmacist = await pharmacistDataAccess.isUserPharmacist(userId);
-
-//     // if (!isPharmacist) {
-//     //   return {
-//     //     status: 403,
-//     //     message: "User is not a pharmacist",
-//     //   };
-//     // }
-
-//     const cancelledOrder = await prisma.orders.update({
-//       where: {
-//         orderId,
-//       },
-//       data: {
-//         orderStatus: "CANCELLED" as orderStatus,
-//         paymentStatus: "FAILED" as paymentStatus,
-//       },
-//     });
-
-//     if (!cancelledOrder) {
-//       return {
-//         status: 404,
-//         message: "Order not found",
-//       };
-//     }
-
-//     const cancelledOrderData = convertBigIntToString(cancelledOrder);
-
-//     return {
-//       status: 200,
-//       message: "Order cancelled successfully",
-//       data: cancelledOrderData,
-//     };
-//   } catch (error: any) {
-//     return {
-//       status: 500,
-//       message: error.message,
-//     };
-//   }
-// };
-
-// //get all orders for a user
-// const getAllUserOrders = async (userId: string) => {
-//   // try {
-//   //   const orders = await prisma.orders.findMany({
-//   //     where: {
-//   //       userId,
-//   //     },
-//   //     include: {
-//   //       OrderItems: true,
-//   //     },
-//   //   });
-//   //   const ordersData = convertBigIntToString(orders);
-//   //   if (!orders) {
-//   //     return {
-//   //       status: 404,
-//   //       message: "Orders not found",
-//   //     };
-//   //   }
-//   //   return {
-//   //     status: 200,
-//   //     message: "Orders fetched successfully",
-//   //     data: ordersData,
-//   //   };
-//   // } catch (error: any) {
-//   //   return {
-//   //     status: 500,
-//   //     message: error.message,
-//   //   };
-//   // }
-// };
-
-// //delete Order
-// // const deleteOrder = async (orderId: string, userId: string) => {
-// //   try {
-// //     const isPharmacist = await pharmacistDataAccess.isUserPharmacist(userId);
-// //     if (!isPharmacist) {
-// //       return {
-// //         status: 403,
-// //         message: "User is not a pharmacist",
-// //       };
-// //     }
-
-// //     const deletedOrder = await prisma.orders.delete({
-// //       where: {
-// //         orderId,
-// //         userId,
-// //       },
-// //     });
-
-// //     if (!deletedOrder) {
-// //       return {
-// //         status: 404,
-// //         message: "Order not found",
-// //       };
-// //     }
-
-// //     return {
-// //       status: 200,
-// //       message: "Order deleted successfully",
-// //       data: deletedOrder,
-// //     };
-// //   } catch (error: any) {
-// //     return {
-// //       status: 500,
-// //       message: error.message,
-// //     };
-// //   }
-// // };
-
-// export default {
-//   createOrder,
-//   getAllPharmacistOrders,
-//   createOrderItem,
-//   getOrderById,
-//   updateOrder,
-//   cancelOrder,
-//   getAllUserOrders,
-//   // deleteOrder,
-// };
+export default {
+  createOrder,
+  updateOrderStatus,
+  getOrderForVendor,
+  createBlockchainRecord,
+};

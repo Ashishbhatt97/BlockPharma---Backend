@@ -2,7 +2,13 @@ import express, { Application } from "express";
 import cors from "cors";
 import morgan from "morgan";
 
-import { userRoutes, vendorRoutes, pharmacistRoutes } from "./routes/routes";
+import {
+  userRoutes,
+  vendorRoutes,
+  pharmacistRoutes,
+  productsRoutes,
+  orderRoutes,
+} from "./routes/routes";
 import bodyParser from "body-parser";
 import path from "path";
 import { getDashboardCounts } from "./controllers/countsController";
@@ -36,8 +42,8 @@ app.use("/api/counts", getDashboardCounts);
 app.use("/api/user", userRoutes);
 app.use("/api/supplier", vendorRoutes);
 app.use("/api/pharmacy", pharmacistRoutes);
-
-// app.use("/api/orders", orderRoutes);
+app.use("/api/products", productsRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

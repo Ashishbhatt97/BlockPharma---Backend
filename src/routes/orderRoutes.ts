@@ -1,17 +1,41 @@
-import express, { Router } from "express";
-import orderController from "../controllers/controllers";
-import { jwtAuth } from "../middleware/jwtAuthentication";
+import express from "express";
+import orderController from "../controllers/orderController";
+import {
+  jwtAuth,
+  checkPharmacy,
+  checkSupplier,
+} from "../middleware/jwtAuthentication";
 
-const router: Router = express.Router();
+const router = express.Router();
 
-// router.route("/createOrder").post(jwtAuth, orderController.createOrder);
-// router.route("/getOrders").get(jwtAuth, orderController.getOrders);
-// router.route("/getOrderById").get(jwtAuth, orderController.getOrderById);
-// router.route("/updateOrder").put(jwtAuth, orderController.updateOrder);
-// router.route("/cancelOrder").put(jwtAuth, orderController.cancelOrder);
-// router
-//   .route("/getAllUserOrders")
-//   .get(jwtAuth, orderController.getAllUserOrders);
-// router.route("/delete").delete(jwtAuth, orderController.deleteOrder);
+// Pharmacy creates an order (with blockchain tx hash)
+router.post("/", jwtAuth, checkPharmacy, orderController.createOrder);
+
+// Get orders for pharmacy
+router.get(
+  "/pharmacy/:pharmacyOutletId",
+  jwtAuth,
+  checkPharmacy,
+  orderController.getPharmacyOrders
+);
+
+// Get pending orders for vendor
+router.get(
+  "/vendor/pending",
+  jwtAuth,
+  checkSupplier,
+  orderController.getVendorPendingOrders
+);
+
+// Update order status (vendor)
+router.put(
+  "/:id/status",
+  jwtAuth,
+  checkSupplier,
+  orderController.updateOrderStatus
+);
+
+// Get order details
+router.get("/:id", jwtAuth, orderController.getOrderDetails);
 
 export default router;

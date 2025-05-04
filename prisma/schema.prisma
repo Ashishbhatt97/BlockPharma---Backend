@@ -89,13 +89,14 @@ model Order {
   paymentStatus    PaymentStatus      @default(PENDING)
   paymentMethod    PaymentMethod
   amount           Float
-  currency         String
+  blockchainTxHash String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   user             User               @relation(fields: [userId], references: [id])
   pharmacyOutlet   PharmacyOutlet     @relation(fields: [pharmacyOutletId], references: [id])
   vendorOrg        VendorOrganization @relation(fields: [vendorOrgId], references: [id])
   orderItems       OrderItem[]
+  BlockchainRecord BlockchainRecord[]
 }
 
 model OrderItem {
@@ -139,6 +140,15 @@ model InventoryItem {
   updatedAt        DateTime       @updatedAt
   product          Product        @relation(fields: [productId], references: [id])
   pharmacyOutlet   PharmacyOutlet @relation(fields: [pharmacyOutletId], references: [id])
+}
+
+model BlockchainRecord {
+  id        String   @id @default(uuid())
+  txHash    String   @unique
+  orderId   String?
+  action    String
+  timestamp DateTime @default(now())
+  order     Order?   @relation(fields: [orderId], references: [id])
 }
 
 enum Role {

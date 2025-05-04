@@ -100,6 +100,7 @@ const loginUser = async (userObj: loginSchemaType) => {
       const payload = {
         id: user.id,
         email: user.email,
+        role: user.role,
       };
 
       const token = tokenGenerator(payload);
@@ -322,6 +323,8 @@ const getUserById = async (userId: string) => {
         address: true,
         vendorOrganizations: true,
         pharmacyOutlets: true,
+        orders: true,
+        _count: true,
       },
     });
 

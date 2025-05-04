@@ -1,133 +1,128 @@
-// import { OrderSchemaType, UpdateOrderSchemaType } from "../models/Orders";
-// // import { orderDataAccess } from "../data access/dataAccess";
+import {
+  orderDataAccess,
+  pharmacistDataAccess,
+} from "../data access/dataAccess";
+import { OrderStatus } from "@prisma/client";
 
-// const createOrderService = async (
-//   id: string,
-//   validatedOrder: OrderSchemaType
-// ) => {
-//   // const order = await orderDataAccess.createOrder(id, validatedOrder);
-//   // if (!order || order.status !== 201) {
-//   //   return {
-//   //     status: order.status,
-//   //     message: order.message,
-//   //   };
-//   // }
-//   // return {
-//   //   status: order.status,
-//   //   message: order.message,
-//   //   data: order.data,
-//   // };
-// };
+const createOrder = async (orderData: any) => {
+  try {
+    const pharmacyOutlet = await pharmacistDataAccess.isOwnerOfPharmacy(
+      orderData.pharmacyOutletId,
+      orderData.userId
+    );
 
-// const getAllPharmacistOrdersService = async (userId: string) => {
-//   const orders = await orderDataAccess.getAllPharmacistOrders(userId);
+    if (!pharmacyOutlet) {
+      return {
+        status: 403,
+        error: "You don't own this pharmacy outlet",
+      };
+    }
 
-//   // if (!orders || orders.status !== 200) {
-//   //   return {
-//   //     status: orders.status,
-//   //     message: orders.message,
-//   //   };
-//   // }
+    // Verify all products belong to the vendor
+    // const validProducts = await orderDataAccess.verifyProducts(
+    //   orderData.orderItems,
+    //   orderData.vendorOrgId
+    // );
 
-//   // return {
-//   //   status: orders.status,
-//   //   message: orders.message,
-//   //   data: orders.data,
-//   // };
-// };
+    // if (!validProducts) {
+    //   return {
+    //     status: 400,
+    //     error: "One or more products don't belong to this vendor",
+    //   };
+    // }
 
-// const getOrderByIdService = async (orderId: string) => {
-//   const order = await orderDataAccess.getOrderById(orderId);
+    // Create blockchain transaction record
+    if (orderData.blockchainTxHash) {
+      await orderDataAccess.createBlockchainRecord({
+        txHash: orderData.blockchainTxHash,
+        orderId: "", // Will be updated after order creation
+        action: "ORDER_CREATED",
+      });
+    }
 
-//   // if (!order || order.status !== 200) {
-//   //   return {
-//   //     status: order?.status,
-//   //     message: order?.message,
-//   //   };
-//   // }
+    const order = await orderDataAccess.createOrder(orderData);
 
-//   // return {
-//   //   status: order.status,
-//   //   message: order.message,
-//   //   data: order.data,
-//   // };
-// };
+    // Update blockchain record with order ID if created
+    // if (orderData.blockchainTxHash && order.data?.id) {
+    //   await orderDataAccess.updateBlockchainRecord(orderData.blockchainTxHash, {
+    //     orderId: order.data.id,
+    //   });
+    // }
 
-// const updateOrderService = async (
-//   orderId: string,
-//   orderDetails: UpdateOrderSchemaType
-// ) => {
-//   const updatedOrder = await orderDataAccess.updateOrder(orderId, orderDetails);
+    return {
+      status: 201,
+      data: order,
+      message: "Order created successfully",
+    };
+  } catch (error: any) {
+    return {
+      status: 400,
+      error: error.message || "Error creating order",
+    };
+  }
+};
 
-//   // if (!updatedOrder || updatedOrder.status !== 200) {
-//   //   return {
-//   //     status: updatedOrder?.status,
-//   //     message: updatedOrder?.message,
-//   //   };
-//   // }
+const updateOrderStatus = async (
+  orderId: string,
+  status: OrderStatus,
+  userId?: string,
+  blockchainTxHash?: string
+) => {
+  try {
+    // Verify order belongs to vendor
+    const order = await orderDataAccess.getOrderForVendor(orderId, userId);
+    if (!order) {
+      return {
+        status: 403,
+        error: "You don't have permission to update this order",
+      };
+    }
 
-//   // return {
-//   //   status: updatedOrder.status,
-//   //   message: updatedOrder.message,
-//   //   data: updatedOrder.data,
-//   // };
-// };
+    // Validate status transition
+    // const validTransition = await orderDataAccess.validateStatusTransition(
+    //   order.orderStatus,
+    //   status
+    // );
 
-// const cancelOrderService = async (orderId: string, userId: string) => {
-//   const cancelledOrder = await orderDataAccess.cancelOrder(orderId, userId);
+    // if (!validTransition) {
+    //   return {
+    //     status: 400,
+    //     error: "Invalid status transition",
+    //   };
+    // }
 
-//   if (!cancelledOrder || cancelledOrder.status !== 200) {
-//     return {
-//       status: cancelledOrder?.status,
-//       message: cancelledOrder?.message,
-//     };
-//   }
+    // Create blockchain record for status update
+    if (blockchainTxHash) {
+      await orderDataAccess.createBlockchainRecord({
+        txHash: blockchainTxHash,
+        orderId,
+        action: `STATUS_${status}`,
+      });
+    }
 
-//   return {
-//     status: cancelledOrder.status,
-//     message: cancelledOrder.message,
-//     data: cancelledOrder.data,
-//   };
-// };
+    const updatedOrder = await orderDataAccess.updateOrderStatus(
+      orderId,
+      status,
+      blockchainTxHash
+    );
 
-// const getAllUserOrdersService = async (userId: string) => {
-//   const orders = await orderDataAccess.getAllUserOrders(userId);
+    return {
+      status: 200,
+      data: updatedOrder,
+      message: "Order status updated successfully",
+    };
+  } catch (error: any) {
+    return {
+      status: 400,
+      error: error.message || "Error updating order status",
+    };
+  }
+};
 
-//   // if (!orders || orders.status !== 200) {
-//   //   return {
-//   //     status: orders.status,
-//   //     message: orders.message,
-//   //   };
-//   // }
-
-//   // return {
-//   //   status: orders.status,
-//   //   message: orders.message,
-//   //   data: orders.data,
-//   // };
-// };
-
-// const deleteOrderService = async (orderId: string, userId: string) => {
-//   // const deletedOrder = await orderDataAccess.deleteOrder(orderId, userId);
-//   // if (!deletedOrder || deletedOrder.status !== 200) {
-//   //   return {
-//   //     status: deletedOrder?.status,
-//   //     message: deletedOrder?.message,
-//   //   };
-//   // }
-//   // return {
-//   //   status: deletedOrder.status,
-//   //   message: deletedOrder.message,
-//   //   data: deletedOrder.data,
-//   // };
-// };
-
-// export default {
-//   createOrderService,
-//   getAllPharmacistOrdersService,
-//   getOrderByIdService,
-//   updateOrderService,
-//   cancelOrderService,
-//   getAllUserOrdersService,
-//   deleteOrderService,
-// };
+export default {
+  createOrder,
+  // getPharmacyOrders,
+  // getVendorPendingOrders,
+  updateOrderStatus,
+  // getOrderDetails,
+};

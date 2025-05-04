@@ -403,6 +403,16 @@ const updatePharmacyOutlet = async (
 //   return pharmacist ? true : false;
 // };
 
+const isOwnerOfPharmacy = async (userId: string, pharmacyId: string) => {
+  const pharmacy = await prisma.pharmacyOutlet.findUnique({
+    where: {
+      id: pharmacyId,
+      ownerId: userId,
+    },
+  });
+  return pharmacy ? true : false;
+};
+
 export default {
   // addPharmacist,
   // getPharmacist,
@@ -414,5 +424,6 @@ export default {
   deletePharmacyOutlet,
   getAllPharmacyOutlets,
   updatePharmacyOutlet,
+  isOwnerOfPharmacy,
   // isUserPharmacist,
 };
