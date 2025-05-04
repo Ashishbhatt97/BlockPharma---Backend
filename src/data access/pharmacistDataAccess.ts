@@ -403,7 +403,7 @@ const updatePharmacyOutlet = async (
 //   return pharmacist ? true : false;
 // };
 
-const isOwnerOfPharmacy = async (userId: string, pharmacyId: string) => {
+const isOwnerOfPharmacy = async (pharmacyId: string, userId: string) => {
   const pharmacy = await prisma.pharmacyOutlet.findUnique({
     where: {
       id: pharmacyId,

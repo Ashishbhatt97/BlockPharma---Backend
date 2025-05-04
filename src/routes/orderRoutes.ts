@@ -10,6 +10,12 @@ const router = express.Router();
 
 // Pharmacy creates an order (with blockchain tx hash)
 router.post("/", jwtAuth, checkPharmacy, orderController.createOrder);
+router.get(
+  "/all",
+  jwtAuth,
+  checkPharmacy,
+  orderController.getAllPharmacyOrders
+);
 
 // Get orders for pharmacy
 router.get(

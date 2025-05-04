@@ -5,25 +5,16 @@ const createOrder = async (orderData: any) => {
   return await prisma.$transaction(async (prisma) => {
     const order = await prisma.order.create({
       data: {
-        userId: orderData.userId,
-        pharmacyOutletId: orderData.pharmacyOutletId,
-        vendorOrgId: orderData.vendorOrgId,
         paymentMethod: orderData.paymentMethod,
         amount: orderData.amount || 0,
         blockchainTxHash: orderData.blockchainTxHash,
-        orderDate: new Date(), // Add orderDate
-        user: {
-          connect: { id: orderData.userId }, // Connect user relation
-        },
-        pharmacyOutlet: {
-          connect: { id: orderData.pharmacyOutletId }, // Connect pharmacyOutlet relation
-        },
-        vendorOrg: {
-          connect: { id: orderData.vendorOrgId }, // Connect vendorOrg relation
-        },
+        orderDate: new Date(),
+        user: { connect: { id: orderData.userId } },
+        pharmacyOutlet: { connect: { id: orderData.pharmacyOutletId } },
+        vendorOrg: { connect: { id: orderData.vendorOrgId } },
         orderItems: {
           create: orderData.orderItems.map((item: any) => ({
-            productId: item.productId,
+            product: { connect: { id: item.productId } },
             quantity: item.quantity,
             price: item.price,
           })),
@@ -34,7 +25,6 @@ const createOrder = async (orderData: any) => {
       },
     });
 
-    // 2. Update inventory (optional)
     await Promise.all(
       orderData.orderItems.map((item: any) =>
         prisma.inventoryItem.updateMany({
@@ -43,9 +33,7 @@ const createOrder = async (orderData: any) => {
             pharmacyOutletId: orderData.pharmacyOutletId,
           },
           data: {
-            stock: {
-              decrement: item.quantity,
-            },
+            stock: { decrement: item.quantity },
           },
         })
       )
@@ -89,14 +77,52 @@ const getOrderForVendor = async (orderId: string, vendorUserId?: string) => {
   });
 };
 
+const getAllOrderForPharmacist = async (pharmacistUserId?: string) => {
+  return await prisma.order.findMany({
+    where: {
+      pharmacyOutlet: {
+        ownerId: pharmacistUserId,
+      },
+    },
+    include: {
+      orderItems: {
+        include: {
+          product: true,
+        },
+      },
+      pharmacyOutlet: true,
+      vendorOrg: true,
+    },
+  });
+};
+
 const createBlockchainRecord = async (data: {
   txHash: string;
   orderId?: string;
   action: string;
 }) => {
-  return await prisma.blockchainRecord.create({
+  const res = await prisma.blockchainRecord.create({
     data: {
       txHash: data.txHash,
+      orderId: data.orderId,
+      action: data.action,
+      timestamp: new Date(),
+    },
+  });
+  console.log(res);
+  return res;
+};
+
+const updateBlockchainRecord = async (data: {
+  txHash: string;
+  orderId?: string;
+  action: string;
+}) => {
+  return await prisma.blockchainRecord.update({
+    where: {
+      txHash: data.txHash,
+    },
+    data: {
       orderId: data.orderId,
       action: data.action,
       timestamp: new Date(),
@@ -109,4 +135,6 @@ export default {
   updateOrderStatus,
   getOrderForVendor,
   createBlockchainRecord,
+  updateBlockchainRecord,
+  getAllOrderForPharmacist,
 };

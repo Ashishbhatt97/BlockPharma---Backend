@@ -58,10 +58,23 @@ const getOrderDetails = asyncHandler(async (req: Request, res: Response) => {
   // sendResponse(res, result.status, result);
 });
 
+const getAllPharmacyOrders = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { error: "Unauthorized" });
+    }
+    const { id } = req.user;
+
+    const result = await orderServices.getAllOrderForPharmacistService(id);
+    sendResponse(res, result.status, result);
+  }
+);
+
 export default {
   createOrder,
   getPharmacyOrders,
   getVendorPendingOrders,
   updateOrderStatus,
   getOrderDetails,
+  getAllPharmacyOrders,
 };

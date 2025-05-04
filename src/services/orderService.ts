@@ -1,53 +1,17 @@
-import {
-  orderDataAccess,
-  pharmacistDataAccess,
-} from "../data access/dataAccess";
 import { OrderStatus } from "@prisma/client";
+import { orderDataAccess } from "../data access/dataAccess";
 
 const createOrder = async (orderData: any) => {
   try {
-    const pharmacyOutlet = await pharmacistDataAccess.isOwnerOfPharmacy(
-      orderData.pharmacyOutletId,
-      orderData.userId
-    );
+    const order = await orderDataAccess.createOrder(orderData);
 
-    if (!pharmacyOutlet) {
-      return {
-        status: 403,
-        error: "You don't own this pharmacy outlet",
-      };
-    }
-
-    // Verify all products belong to the vendor
-    // const validProducts = await orderDataAccess.verifyProducts(
-    //   orderData.orderItems,
-    //   orderData.vendorOrgId
-    // );
-
-    // if (!validProducts) {
-    //   return {
-    //     status: 400,
-    //     error: "One or more products don't belong to this vendor",
-    //   };
-    // }
-
-    // Create blockchain transaction record
-    if (orderData.blockchainTxHash) {
+    if (orderData.blockchainTxHash && order.id) {
       await orderDataAccess.createBlockchainRecord({
         txHash: orderData.blockchainTxHash,
-        orderId: "", // Will be updated after order creation
+        orderId: order.id,
         action: "ORDER_CREATED",
       });
     }
-
-    const order = await orderDataAccess.createOrder(orderData);
-
-    // Update blockchain record with order ID if created
-    // if (orderData.blockchainTxHash && order.data?.id) {
-    //   await orderDataAccess.updateBlockchainRecord(orderData.blockchainTxHash, {
-    //     orderId: order.data.id,
-    //   });
-    // }
 
     return {
       status: 201,
@@ -55,6 +19,7 @@ const createOrder = async (orderData: any) => {
       message: "Order created successfully",
     };
   } catch (error: any) {
+    console.error("Error creating order:", error);
     return {
       status: 400,
       error: error.message || "Error creating order",
@@ -119,10 +84,26 @@ const updateOrderStatus = async (
   }
 };
 
+const getAllOrderForPharmacistService = async (pharmacistUserId: string) => {
+  try {
+    const orders = await orderDataAccess.getAllOrderForPharmacist(
+      pharmacistUserId
+    );
+    return {
+      status: 200,
+      data: orders,
+      message: "Orders fetched successfully",
+    };
+  } catch (error: any) {
+    return {
+      status: 400,
+      error: error.message || "Error fetching orders",
+    };
+  }
+};
+
 export default {
   createOrder,
-  // getPharmacyOrders,
-  // getVendorPendingOrders,
   updateOrderStatus,
-  // getOrderDetails,
+  getAllOrderForPharmacistService,
 };
