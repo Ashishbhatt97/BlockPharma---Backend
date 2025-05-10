@@ -9,6 +9,8 @@ const createOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
     return sendResponse(res, 401, { error: "Unauthorized" });
   }
 
+  console.log(req.body);
+
   const result = await orderServices.createOrder({
     ...req.body,
     userId: req.user.id,

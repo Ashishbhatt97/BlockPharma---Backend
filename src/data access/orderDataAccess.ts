@@ -2,6 +2,8 @@ import prisma from "../config/db.config";
 import { OrderStatus } from "@prisma/client";
 
 const createOrder = async (orderData: any) => {
+  console.log(orderData, "orderData");
+
   return await prisma.$transaction(async (prisma) => {
     const order = await prisma.order.create({
       data: {
@@ -14,30 +16,13 @@ const createOrder = async (orderData: any) => {
         vendorOrg: { connect: { id: orderData.vendorOrgId } },
         orderItems: {
           create: orderData.orderItems.map((item: any) => ({
-            product: { connect: { id: item.productId } },
+            productId: item.productId,
             quantity: item.quantity,
             price: item.price,
           })),
         },
       },
-      include: {
-        orderItems: true,
-      },
     });
-
-    await Promise.all(
-      orderData.orderItems.map((item: any) =>
-        prisma.inventoryItem.updateMany({
-          where: {
-            productId: item.productId,
-            pharmacyOutletId: orderData.pharmacyOutletId,
-          },
-          data: {
-            stock: { decrement: item.quantity },
-          },
-        })
-      )
-    );
 
     return order;
   });
@@ -55,11 +40,7 @@ const updateOrderStatus = async (
       ...(blockchainTxHash && { blockchainTxHash }),
     },
     include: {
-      orderItems: {
-        include: {
-          product: true,
-        },
-      },
+      orderItems: true,
       pharmacyOutlet: true,
       vendorOrg: true,
     },
@@ -85,11 +66,7 @@ const getAllOrderForPharmacist = async (pharmacistUserId?: string) => {
       },
     },
     include: {
-      orderItems: {
-        include: {
-          product: true,
-        },
-      },
+      orderItems: true,
       pharmacyOutlet: true,
       vendorOrg: true,
     },

@@ -290,11 +290,14 @@ const meService = async (userId: string) => {
       error: "Error getting user",
     };
   }
+
+  const { password, ...rest } = res;
+
   if (res) {
     return {
       status: 200,
       message: "User fetched successfully",
-      data: res,
+      data: rest,
     };
   }
 };

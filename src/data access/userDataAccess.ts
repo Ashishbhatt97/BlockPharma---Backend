@@ -36,6 +36,7 @@ const createUser = async (userObj: RegisterSchemaType) => {
         email: userObj.email,
         password: hashedPassword,
         profilePic: userObj.profilePic || null,
+        walletAddress: userObj.walletAddress,
         isDeleted: false,
         isProfileCompleted: false,
         role: userObj.role || "USER",
