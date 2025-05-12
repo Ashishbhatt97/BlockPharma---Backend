@@ -105,6 +105,15 @@ const getAllOrderForPharmacistService = async (pharmacistUserId: string) => {
 const getAllOrderForSupplierService = async (supplierUserId: string) => {
   try {
     const orders = await orderDataAccess.getAllOrderForSupplier(supplierUserId);
+
+    if (!orders) {
+      return {
+        status: 200,
+        data: null,
+        message: "Orders fetched successfully",
+      };
+    }
+
     return {
       status: 200,
       data: orders,

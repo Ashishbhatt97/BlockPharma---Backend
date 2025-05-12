@@ -110,7 +110,8 @@ const updateBlockchainRecord = async (data: {
 };
 
 const getAllOrderForSupplier = async (supplierUserId?: string) => {
-  return await prisma.order.findMany({
+  console.log(supplierUserId, "supplierUserId");
+  const res = await prisma.order.findMany({
     where: {
       vendorOrg: {
         ownerId: supplierUserId,
@@ -122,6 +123,11 @@ const getAllOrderForSupplier = async (supplierUserId?: string) => {
       vendorOrg: true,
     },
   });
+
+  if (!res) {
+    return null;
+  }
+  return res;
 };
 
 export default {
