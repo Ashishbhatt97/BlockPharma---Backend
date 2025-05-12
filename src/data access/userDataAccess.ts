@@ -322,7 +322,11 @@ const getUserById = async (userId: string) => {
       },
       include: {
         address: true,
-        vendorOrganizations: true,
+        vendorOrganizations: {
+          include: {
+            orders: true,
+          },
+        },
         pharmacyOutlets: true,
         orders: true,
         _count: true,

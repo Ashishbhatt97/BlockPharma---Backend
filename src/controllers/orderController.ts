@@ -9,13 +9,12 @@ const createOrder = asyncHandler(async (req: CustomRequest, res: Response) => {
     return sendResponse(res, 401, { error: "Unauthorized" });
   }
 
-  console.log(req.body);
-
   const result = await orderServices.createOrder({
     ...req.body,
     userId: req.user.id,
     pharmacyOutletId: req.body.pharmacyOutletId,
     blockchainTxHash: req.body.blockchainTxHash,
+    blockchainOrderId: req.body.blockchainOrderId,
   });
 
   sendResponse(res, result.status, result);
@@ -41,7 +40,7 @@ const getVendorPendingOrders = asyncHandler(
 const updateOrderStatus = asyncHandler(
   async (req: CustomRequest, res: Response) => {
     const { id } = req.params;
-    const { status, blockchainTxHash } = req.body;
+    const { orderStatus: status, blockchainTxHash } = req.body;
 
     const result = await orderServices.updateOrderStatus(
       id,
@@ -72,6 +71,18 @@ const getAllPharmacyOrders = asyncHandler(
   }
 );
 
+const getAllSupplierOrders = asyncHandler(
+  async (req: CustomRequest, res: Response) => {
+    if (!req.user) {
+      return sendResponse(res, 401, { error: "Unauthorized" });
+    }
+    const { id } = req.user;
+
+    const result = await orderServices.getAllOrderForSupplierService(id);
+    sendResponse(res, result.status, result);
+  }
+);
+
 export default {
   createOrder,
   getPharmacyOrders,
@@ -79,4 +90,5 @@ export default {
   updateOrderStatus,
   getOrderDetails,
   getAllPharmacyOrders,
+  getAllSupplierOrders,
 };

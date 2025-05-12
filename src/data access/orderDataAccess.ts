@@ -10,6 +10,7 @@ const createOrder = async (orderData: any) => {
         paymentMethod: orderData.paymentMethod,
         amount: orderData.amount || 0,
         blockchainTxHash: orderData.blockchainTxHash,
+        blockchainOrderId: orderData.blockchainOrderId,
         orderDate: new Date(),
         user: { connect: { id: orderData.userId } },
         pharmacyOutlet: { connect: { id: orderData.pharmacyOutletId } },
@@ -33,6 +34,7 @@ const updateOrderStatus = async (
   status: OrderStatus,
   blockchainTxHash?: string
 ) => {
+  console.log(orderId, status, blockchainTxHash, "updateOrderStatus");
   return await prisma.order.update({
     where: { id: orderId },
     data: {
@@ -107,6 +109,21 @@ const updateBlockchainRecord = async (data: {
   });
 };
 
+const getAllOrderForSupplier = async (supplierUserId?: string) => {
+  return await prisma.order.findMany({
+    where: {
+      vendorOrg: {
+        ownerId: supplierUserId,
+      },
+    },
+    include: {
+      orderItems: true,
+      pharmacyOutlet: true,
+      vendorOrg: true,
+    },
+  });
+};
+
 export default {
   createOrder,
   updateOrderStatus,
@@ -114,4 +131,5 @@ export default {
   createBlockchainRecord,
   updateBlockchainRecord,
   getAllOrderForPharmacist,
+  getAllOrderForSupplier,
 };

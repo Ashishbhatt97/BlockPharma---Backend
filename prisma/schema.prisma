@@ -81,23 +81,24 @@ model PharmacyOutlet {
 }
 
 model Order {
-  id               String             @id @default(uuid())
-  userId           String
-  pharmacyOutletId String
-  vendorOrgId      String
-  orderDate        DateTime
-  orderStatus      OrderStatus        @default(PENDING)
-  paymentStatus    PaymentStatus      @default(PENDING)
-  paymentMethod    PaymentMethod
-  amount           Float
-  blockchainTxHash String
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  user             User               @relation(fields: [userId], references: [id])
-  pharmacyOutlet   PharmacyOutlet     @relation(fields: [pharmacyOutletId], references: [id])
-  vendorOrg        VendorOrganization @relation(fields: [vendorOrgId], references: [id])
-  orderItems       OrderItem[]
-  BlockchainRecord BlockchainRecord[]
+  id                String             @id @default(uuid())
+  userId            String
+  pharmacyOutletId  String
+  vendorOrgId       String
+  orderDate         DateTime
+  blockchainOrderId String
+  orderStatus       OrderStatus        @default(PENDING)
+  paymentStatus     PaymentStatus      @default(PENDING)
+  paymentMethod     PaymentMethod
+  amount            Float
+  blockchainTxHash  String
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  user              User               @relation(fields: [userId], references: [id])
+  pharmacyOutlet    PharmacyOutlet     @relation(fields: [pharmacyOutletId], references: [id])
+  vendorOrg         VendorOrganization @relation(fields: [vendorOrgId], references: [id])
+  orderItems        OrderItem[]
+  BlockchainRecord  BlockchainRecord[]
 }
 
 model OrderItem {

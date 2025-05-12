@@ -43,5 +43,6 @@ router.put(
 
 // Get order details
 router.get("/:id", jwtAuth, orderController.getOrderDetails);
+router.get("/vendor/:id", jwtAuth, orderController.getAllSupplierOrders);
 
 export default router;

@@ -102,8 +102,25 @@ const getAllOrderForPharmacistService = async (pharmacistUserId: string) => {
   }
 };
 
+const getAllOrderForSupplierService = async (supplierUserId: string) => {
+  try {
+    const orders = await orderDataAccess.getAllOrderForSupplier(supplierUserId);
+    return {
+      status: 200,
+      data: orders,
+      message: "Orders fetched successfully",
+    };
+  } catch (error: any) {
+    return {
+      status: 400,
+      error: error.message || "Error fetching orders",
+    };
+  }
+};
+
 export default {
   createOrder,
   updateOrderStatus,
   getAllOrderForPharmacistService,
+  getAllOrderForSupplierService,
 };
