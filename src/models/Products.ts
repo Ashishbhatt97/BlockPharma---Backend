@@ -7,7 +7,6 @@ export const ProductSchema = z.object({
   category: z.string().min(1, "Category is required"),
   image: z.string().url("Invalid URL").optional(),
   unit: z.string().min(1, "Unit is required"),
-  price: z.number().positive("Price must be positive"),
   vendorOrgId: z.string().uuid("Invalid vendor organization ID"),
 });
 

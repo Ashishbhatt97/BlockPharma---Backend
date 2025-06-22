@@ -8,6 +8,7 @@ import {
   pharmacistRoutes,
   productsRoutes,
   orderRoutes,
+  inventoryRoutes,
 } from "./routes/routes";
 import bodyParser from "body-parser";
 import path from "path";
@@ -44,6 +45,7 @@ app.use("/api/supplier", vendorRoutes);
 app.use("/api/pharmacy", pharmacistRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/inventory", inventoryRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

@@ -124,4 +124,5 @@ export const checkSupplier = checkRole(["SUPPLIER"]);
 export const checkAdmin = checkRole(["ADMIN"]);
 export const checkSupplierOrAdmin = checkRole(["SUPPLIER", "ADMIN"]);
 export const checkPharmacy = checkRole(["PHARMACY"]);
+export const checkSupplierOrPharmacy = checkRole(["SUPPLIER", "PHARMACY"]);
 export { jwtAuth, tokenGenerator };

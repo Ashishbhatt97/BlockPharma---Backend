@@ -99,14 +99,16 @@ model Order {
   vendorOrg         VendorOrganization @relation(fields: [vendorOrgId], references: [id])
   orderItems        OrderItem[]
   BlockchainRecord  BlockchainRecord[]
+  InventoryItem     InventoryItem[]
 }
 
 model OrderItem {
   id        String   @id @default(uuid())
   orderId   String
-  productId String
+  // productId String
+  name      String
+  category  String
   quantity  Int
-  price     Float
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   order     Order    @relation(fields: [orderId], references: [id])
@@ -120,7 +122,6 @@ model Product {
   category    String
   image       String?
   unit        String
-  price       Float
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
   vendorOrg   VendorOrganization @relation(fields: [vendorOrgId], references: [id])
@@ -129,17 +130,24 @@ model Product {
 }
 
 model InventoryItem {
-  id               String         @id @default(uuid())
-  productId        String
-  pharmacyOutletId String
+  id               String          @id @default(uuid())
+  productId        String?
+  pharmacyOutletId String?
+  // orderId          String?
+  // price            Float
   stock            Int
-  threshold        Int
+  medicineName     String
+  image            String?
   expiry           DateTime
-  batchNumber      String?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  product          Product        @relation(fields: [productId], references: [id])
-  pharmacyOutlet   PharmacyOutlet @relation(fields: [pharmacyOutletId], references: [id])
+  medicineBrand    String
+  category         String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  PharmacyOutlet   PharmacyOutlet? @relation(fields: [pharmacyOutletId], references: [id])
+  Product          Product?        @relation(fields: [productId], references: [id])
+  // Order            Order?          @relation(fields: [orderId], references: [id])
+  Order            Order?          @relation(fields: [orderId], references: [id])
+  orderId          String?
 }
 
 model BlockchainRecord {

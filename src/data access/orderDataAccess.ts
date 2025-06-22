@@ -17,9 +17,9 @@ const createOrder = async (orderData: any) => {
         vendorOrg: { connect: { id: orderData.vendorOrgId } },
         orderItems: {
           create: orderData.orderItems.map((item: any) => ({
-            productId: item.productId,
+            name: item.name,
             quantity: item.quantity,
-            price: item.price,
+            category: item.category,
           })),
         },
       },

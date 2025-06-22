@@ -4,16 +4,22 @@ import {
   jwtAuth,
   checkSupplier,
   checkSupplierOrAdmin,
+  checkSupplierOrPharmacy,
 } from "../middleware/jwtAuthentication";
 
 const router = express.Router();
 
-router.post("/", jwtAuth, checkSupplier, productController.createProduct);
+router.post(
+  "/",
+  jwtAuth,
+  checkSupplierOrPharmacy,
+  productController.createProduct
+);
 
 router.post(
   "/bulk",
   jwtAuth,
-  checkSupplier,
+  checkSupplierOrPharmacy,
   productController.createBulkProducts
 );
 

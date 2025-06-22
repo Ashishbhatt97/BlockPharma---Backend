@@ -3,6 +3,7 @@ import vendorRoutes from "./vendorRoutes";
 import pharmacistRoutes from "./pharmacistRoutes";
 import orderRoutes from "./orderRoutes";
 import productsRoutes from "./productsRoutes";
+import inventoryRoutes from "./inventoryRoutes";
 
 export {
   userRoutes,
@@ -10,4 +11,5 @@ export {
   pharmacistRoutes,
   orderRoutes,
   productsRoutes,
+  inventoryRoutes,
 };

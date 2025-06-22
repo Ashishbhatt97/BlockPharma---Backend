@@ -110,12 +110,12 @@ const getVendorOrgsByIds = async (vendorOrgIds: string[]) => {
 };
 
 // Get order items by product ID
-const getOrderItemsByProduct = async (productId: string) => {
-  const orderItems = await prisma.orderItem.findMany({
-    where: { productId },
-  });
-  return orderItems;
-};
+// const getOrderItemsByProduct = async (productId: string) => {
+//   const orderItems = await prisma.orderItem.findMany({
+//     where: {  },
+//   });
+//   return orderItems;
+// };
 
 // Get inventory items by product ID
 const getInventoryItemsByProduct = async (productId: string) => {
@@ -134,6 +134,6 @@ export default {
   deleteProduct,
   getVendorOrgById,
   getVendorOrgsByIds,
-  getOrderItemsByProduct,
+  // getOrderItemsByProduct,
   getInventoryItemsByProduct,
 };

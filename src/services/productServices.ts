@@ -131,17 +131,17 @@ const deleteProduct = async (productId: string) => {
     }
 
     // Check if product is referenced in any order or inventory
-    const [orderItems, inventoryItems] = await Promise.all([
-      productDataAccess.getOrderItemsByProduct(productId),
-      productDataAccess.getInventoryItemsByProduct(productId),
-    ]);
+    // const [orderItems, inventoryItems] = await Promise.all([
+    //   productDataAccess.getOrderItemsByProduct(productId),
+    //   productDataAccess.getInventoryItemsByProduct(productId),
+    // ]);
 
-    if (orderItems.length > 0 || inventoryItems.length > 0) {
-      return {
-        status: 400,
-        error: "Cannot delete product that exists in orders or inventory",
-      };
-    }
+    // if (orderItems.length > 0 || inventoryItems.length > 0) {
+    //   return {
+    //     status: 400,
+    //     error: "Cannot delete product that exists in orders or inventory",
+    //   };
+    // }
 
     await productDataAccess.deleteProduct(productId);
     return {

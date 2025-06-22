@@ -114,7 +114,7 @@ async function main() {
       category: "Pain Relief",
       image: "https://example.com/paracetamol.jpg",
       unit: "tablet",
-      price: 2.99,
+
       vendorOrgId: "f0238ce0-28d3-43fd-916e-e918d84f23ea",
     },
     {
@@ -124,7 +124,7 @@ async function main() {
       category: "Pain Relief",
       image: "https://example.com/crocin.jpg",
       unit: "tablet",
-      price: 3.5,
+
       vendorOrgId: "f0238ce0-28d3-43fd-916e-e918d84f23ea",
     },
     {
@@ -134,7 +134,7 @@ async function main() {
       category: "Pain Relief",
       image: "https://example.com/calpol.jpg",
       unit: "tablet",
-      price: 3.75,
+
       vendorOrgId: "f0238ce0-28d3-43fd-916e-e918d84f23ea",
     },
     {
@@ -144,7 +144,7 @@ async function main() {
       category: "Pain Relief",
       image: "https://example.com/nise.jpg",
       unit: "tablet",
-      price: 4.2,
+
       vendorOrgId: "f0238ce0-28d3-43fd-916e-e918d84f23ea",
     },
     {
@@ -154,7 +154,7 @@ async function main() {
       category: "Pain Relief",
       image: "https://example.com/disprin.jpg",
       unit: "tablet",
-      price: 2.5,
+
       vendorOrgId: "f0238ce0-28d3-43fd-916e-e918d84f23ea",
     },
     {
@@ -455,17 +455,17 @@ async function main() {
     },
   ];
 
-  const createdProducts = await Promise.all(
-    products.map((product) =>
-      prisma.product.create({
-        data: {
-          ...product,
-          vendorOrgId: vendorOrg.id,
-        },
-      })
-    )
-  );
-  console.log(`Created ${createdProducts.length} products`);
+  // const createdProducts = await Promise.all(
+  //   products.map((product) =>
+  //     prisma.product.create({
+  //       data: {
+  //         ...product,
+  //         vendorOrgId: vendorOrg.id,
+  //       },
+  //     })
+  //   )
+  // );
+  // console.log(`Created ${createdProducts.length} products`);
 
   // 4. Create some inventory items in the pharmacy
   //   const inventoryItems = await Promise.all(
